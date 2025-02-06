@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_menu_work_unit_others" model="ir.actions.act_window">
+        <field name="name">Harga Satuan Pekerjaan - Other</field>
+        <field name="res_model">boq.others</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="menu_work_unit_others_tree" model="ir.ui.view">
+        <field name="name">menu.others.tree</field>
+        <field name="model">boq.others</field>
+        <field name="arch" type="xml">
+            <tree string="others Tree">
+                <field name="id"/>
+                <field name="others_profit"/>
+                <field name="others_others"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="menu_work_unit_others_form" model="ir.ui.view">
+        <field name="name">menu.others.form</field>
+        <field name="model">boq.others</field>
+        <field name="arch" type="xml">
+            <form string="others Form">
+                <sheet>
+                    <header>
+                        <span class="oe_inline">others</span>
+                        <field name="id" string="others ID"/>
+                    </header>
+                </sheet>
+                <sheet>
+                    <group class="bg-light p-4 mb-4">
+                        <field name="others_profit"/>
+                        <field name="others_others" widget="monetary"/>
+                    </group>
+ 
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+</odoo>

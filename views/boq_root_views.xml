@@ -1,0 +1,42 @@
+<odoo>
+    <!-- action -->
+    <record id="action_menu_boq_root" model="ir.actions.act_window">
+        <field name="name">BoQ</field>
+        <field name="res_model">boq.root</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- tree -->
+    <record id="menu_boq_tree" model="ir.ui.view">
+        <field name="name">menu.boq.tree</field>
+        <field name="model">boq.root</field>
+        <field name="arch" type="xml">
+            <tree string="BoQ Tree">
+                <field name="boq_code"/>
+                <field name="boq_name"/>
+                <field name="price_final"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- form -->
+    <record id="menu_boq_form" model="ir.ui.view">
+        <field name="name">menu.boq.form</field>
+        <field name="model">boq.root</field>
+        <field name="arch" type="xml">
+            <form string="BoQ Form">
+                <sheet>
+                    <group>
+                        <field name="boq_name"/>
+                        <field name="material_margin"/>
+                        <field name="installation_margin"/>
+                        <field name="work_unit_id"/>
+                        <field name="price_final"/>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

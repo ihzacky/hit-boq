@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu Structure -->
+        <menuitem 
+            id="menu_boq" 
+            name="BoQ"
+        />
+        
+        <menuitem
+            id="menu_boq_root" 
+            name="All BoQ" 
+            action="action_menu_boq_root"
+            parent="menu_boq"
+        />
+
+        <menuitem
+            id="menu_work_unit"
+            name="Harga Satuan Pekerjaan"
+            parent="menu_boq"
+        />
+       
+        <menuitem
+            id="menu_work_unit_home"
+            name="Home"
+            action="action_menu_work_unit"
+            parent="menu_work_unit"
+            sequence="10"
+        />
+
+        <menuitem
+            id="menu_work_unit_material"
+            name="Material"
+            action="action_menu_work_unit_material"
+            parent="menu_work_unit"
+            sequence="11"
+        />
+        
+        <menuitem
+            id="menu_work_unit_service"
+            name="Jasa"
+            action="action_menu_work_unit_service"
+            parent="menu_work_unit"
+            sequence="12"
+        />
+        
+        <menuitem
+            id="menu_work_unit_others"
+            name="Lain-lain"    
+            action="action_menu_work_unit_others"
+            parent="menu_work_unit"
+            sequence="13"
+        />
+    </data>
+</odoo>
