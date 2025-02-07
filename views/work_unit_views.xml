@@ -64,7 +64,9 @@
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
                                 <field name="material_name"/>
                                 <field name="material_code"/>
-                                <field name="product_lst_price"/>
+                                <field name="material_quantity"/>
+                                <field name="material_price"/>
+                                <field name="product_base_price"/>
                             </tree>
                         </field>
                         <field name="materials_price"/>
@@ -77,7 +79,10 @@
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
                                 <field name="service_name"/>
                                 <field name="service_unit"/>
-                                <!-- <field name="product_lst_price"/> -->
+                                <field name="service_quantity"/>
+                                <field name="service_price"/>
+                                <field name="service_base_price"/>
+                                
                             </tree>
                         </field>
                         <field name="services_price"/>

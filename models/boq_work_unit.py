@@ -58,7 +58,7 @@ class BoqWorkUnit(models.Model):
             # line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
             
             # ini testing
-            line.materials_price = sum(line.material_ids.mapped('product_lst_price')) if line.material_ids else 0.0
+            line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
             
             # Compute service price
             line.services_price = sum(line.service_ids.mapped('service_price')) if line.service_ids else 0.0
