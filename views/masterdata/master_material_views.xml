@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+     <record id="action_menu_master_material" model="ir.actions.act_window">
+        <field name="name">Material Master</field>
+        <field name="res_model">boq.master_material</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_master_material_tree" model="ir.ui.view">
+        <field name="name">boq.master.material.tree</field>
+        <field name="model">boq.master_material</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="material_code"/>
+                <field name="name"/>
+                <field name="material_unit"/>
+                <field name="lst_price"/>
+                <field name="standard_price"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_master_material_form" model="ir.ui.view">
+        <field name="name">boq.master.material.form</field>
+        <field name="model">boq.master_material</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Add buttons if needed -->
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <field name="name" placeholder="Product Name"/>
+                        </h1>
+                        <div>
+                            <field name="material_code" placeholder="Material Code"/>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="General Information" name="general_information">
+                            <group>
+                                <group>
+                                    <field name="material_unit"/>
+                                    <field name="material_description"/>
+                                    <field name="default_code"/>
+                                    <field name="barcode"/>
+                                    <field name="detailed_type"/>
+                                </group>
+                                <group>
+                                    <field name="lst_price" string="Sales Price"/>
+                                    <field name="standard_price" string="Cost"/>
+                                    <field name="categ_id"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                    <field name="uom_po_id" groups="uom.group_uom"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Material Lines" name="material_lines">
+                            <field name="material_line_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

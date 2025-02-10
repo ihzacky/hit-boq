@@ -3,17 +3,17 @@
 
     <record id="action_menu_work_unit_material" model="ir.actions.act_window">
         <field name="name">Harga Satuan Pekerjaan - Material</field>
-        <field name="res_model">boq.material</field>
+        <field name="res_model">boq.material.line</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="menu_work_unit_material_tree" model="ir.ui.view">
-        <field name="name">menu.material.tree</field>
-        <field name="model">boq.material</field>
+        <field name="name">menu.material.line.tree</field>
+        <field name="model">boq.material.line</field>
         <field name="arch" type="xml">
             <tree string="Material Tree">
                 <field name="id"/>
-                <field name="material_code"/>
+                <!-- <field name="material_code"/> -->
                 <field name="material_name"/>
                 <field name="material_price"/>
 
@@ -22,8 +22,8 @@
     </record>
 
     <record id="menu_work_unit_material_form" model="ir.ui.view">
-        <field name="name">menu.material.form</field>
-        <field name="model">boq.material</field>
+        <field name="name">menu.material.line.form</field>
+        <field name="model">boq.material.line</field>
         <field name="arch" type="xml">
             <form string="Material Form">
                 <sheet>
@@ -36,7 +36,7 @@
                     <group class="bg-light p-4 mb-4">
 
                         <field name="id"/>
-                        <field name="material_code"/>
+                        <!-- <field name="material_code"/> -->
                         <field name="material_name"/>
                         <field name="material_price"/>
                     </group>

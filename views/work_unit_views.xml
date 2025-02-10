@@ -61,9 +61,11 @@
                         <field name="material_ids" force_save="1">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
+                                <!-- <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/> -->
+                                <!-- <field name="master_material_id" widget="many2one" options="{'no_create': True}" string="Product"/> -->
+                                <field name="master_material_id" widget="many2one" string="Product"/>
                                 <field name="material_name"/>
-                                <field name="material_code"/>
+                                <!-- <field name="material_code"/> -->
                                 <field name="material_quantity"/>
                                 <field name="material_price"/>
                                 <field name="product_base_price"/>

@@ -6,6 +6,6 @@ class BoqWorkUnitProfit(models.Model):
 
     work_unit_profit_percentage = fields.Integer(string="Persentase Keuntungan")
 
-    work_unit_id = fields.Oney2many(comodel_name="boq.work_unit", inverse_name="work_unit_profit_id", string="Harga satuan pekerjaan")
+    work_unit_id = fields.One2many(comodel_name="boq.work_unit", inverse_name="work_unit_profit_id", string="Harga satuan pekerjaan")
     
     

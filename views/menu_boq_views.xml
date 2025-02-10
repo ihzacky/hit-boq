@@ -51,5 +51,21 @@
             parent="menu_work_unit"
             sequence="13"
         />
+
+        <menuitem
+            id="menu_work_unit_master_material"
+            name="Material Master"    
+            action="action_menu_master_material"
+            parent="menu_work_unit"
+            sequence="14"
+        />
+        
+        <!-- <menuitem
+            id="menu_work_unit_master_service"
+            name="Service Master"    
+            action="action_menu_master_service"
+            parent="menu_work_unit"
+            sequence="14"
+        /> -->
     </data>
 </odoo>

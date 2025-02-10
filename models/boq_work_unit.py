@@ -15,10 +15,18 @@ class BoqWorkUnit(models.Model):
     
     price_unit = fields.Monetary(string="Harga Satuan Pekerjaan", currency_field="currency_id", compute="_compute_price_unit")
     
-    material_ids = fields.One2many(comodel_name='boq.material', inverse_name="work_unit_id", string='Satuan Pekerjaan - Material')
+    material_ids = fields.One2many(
+        comodel_name='boq.material.line',
+        inverse_name="work_unit_id",
+        string='Satuan Pekerjaan - Material'
+    )
     materials_price = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", store=True)
 
-    service_ids = fields.One2many(comodel_name='boq.service', inverse_name="work_unit_id", string='Satuan Pekerjaan - Jasa')
+    service_ids = fields.One2many(
+        comodel_name='boq.service.line',
+        inverse_name="work_unit_id",
+        string='Satuan Pekerjaan - Jasa'
+    )
     services_price = fields.Monetary(string="Harga Jasa", currency_field="currency_id", compute="_compute_component_prices", store=True)
 
     others_ids = fields.One2many(comodel_name="boq.others", inverse_name="work_unit_id", string="Satuan Pekerjaan - Lain-Lain")
@@ -85,4 +93,4 @@ class BoqWorkUnit(models.Model):
 
 
 
-    
+
