@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action Window -->
+    <record id="action_menu_material_variant" model="ir.actions.act_window">
+        <field name="name">Material Variants</field>
+        <field name="res_model">boq.material.variant</field>
+        <field name="view_mode">tree,form,kanban</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_material_variant_tree" model="ir.ui.view">
+        <field name="name">boq.material.variant.tree</field>
+        <field name="model">boq.material.variant</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="variant_code"/>
+                <field name="name"/>
+                <field name="material_master_id"/>
+                <field name="lst_price"/>
+                <field name="standard_price" optional="show"/>
+                <field name="uom_id" optional="show"/>
+                <field name="categ_id" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_material_variant_form" model="ir.ui.view">
+        <field name="name">boq.material.variant.form</field>
+        <field name="model">boq.material.variant</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Add buttons if needed -->
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" string="Variant Name"/>
+                        <h1>
+                            <field name="name" placeholder="Variant Name"/>
+                        </h1>
+                        <div>
+                            <field name="variant_code" placeholder="Variant Code"/>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="General Information" name="general_information">
+                            <group>
+                                <group>
+                                    <field name="material_master_id"/>
+                                    <field name="variant_code"/>
+                                    <field name="variant_description"/>
+                                    <field name="default_code"/>
+                                    <field name="barcode"/>
+                                </group>
+                                <group>
+                                    <field name="lst_price" string="Sales Price"/>
+                                    <field name="standard_price" string="Cost"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                    <field name="uom_po_id" groups="uom.group_uom"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Variant Description" name="variant_description">
+                            <field name="variant_description" placeholder="Describe the variant specifics..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_material_variant_kanban" model="ir.ui.view">
+        <field name="name">boq.material.variant.kanban</field>
+        <field name="model">boq.material.variant</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="variant_code"/>
+                <field name="material_master_id"/>
+                <field name="lst_price"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('boq.material.variant', 'image_1920', record.id.raw_value)" alt="Variant Image"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div>
+                                    Code: <field name="variant_code"/>
+                                </div>
+                                <div>
+                                    Master: <field name="material_master_id"/>
+                                </div>
+                                <div>
+                                    Price: <field name="lst_price" widget="monetary"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_material_variant_search" model="ir.ui.view">
+        <field name="name">boq.material.variant.search</field>
+        <field name="model">boq.material.variant</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="variant_code"/>
+                <field name="material_master_id"/>
+                <field name="variant_description"/>
+                <group expand="0" string="Group By">
+                    <filter string="Master Material" name="groupby_master" domain="[]" context="{'group_by': 'material_master_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

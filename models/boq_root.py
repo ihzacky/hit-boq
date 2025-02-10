@@ -1,32 +1,27 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class BoqRoot(models.Model):
     _name = 'boq.root'
     _description = 'BoQ Root'
 
-
-    boq_code = fields.Char(string='Kode BoQ')
-    boq_name = fields.Char(string='Nama')
-    material_margin = fields.Float(string='Material Margin')
-    installation_margin = fields.Float(string='Installation Margin')
-    updated_date = fields.Datetime(string="Updated Date") 
-    updated_by = fields.Char(string="Updated By")
-
-    price_final = fields.Monetary(string='Total Harga', currency_field='currency_id')
-
-    # tambahin status
-
-    work_unit_id = fields.Many2many(
+    boq_code = fields.Char(string='BoQ Code', required=True)
+    boq_name = fields.Char(string='BoQ Name', required=True)
+    material_margin = fields.Float(string='Material Margin (%)', default=0.0)
+    installation_margin = fields.Float(string='Installation Margin (%)', default=0.0)
+    price_final = fields.Float(string='Final Price', compute='_compute_price_final', store=True)
+    work_unit_id = fields.One2many(
         comodel_name='boq.work_unit',
-        string='Work Unit Root'
+        inverse_name='boq_root_id',
+        string='Work Units'
     )
-    currency_id = fields.Many2one(
-        comodel_name="res.currency", 
-        string="Currency", 
-        default=lambda self: self.env.ref('base.IDR'),
-        readonly=True,
-    )
-    
 
-    
-    
+    @api.depends('work_unit_id', 'material_margin', 'installation_margin')
+    def _compute_price_final(self):
+        for record in self:
+            base_price = sum(record.work_unit_id.mapped('price_unit'))
+            material_margin = base_price * (record.material_margin / 100)
+            installation_margin = base_price * (record.installation_margin / 100)
+            record.price_final = base_price + material_margin + installation_margin
+
+
+

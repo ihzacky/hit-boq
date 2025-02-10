@@ -29,7 +29,11 @@ class BoqWorkUnit(models.Model):
     )
     services_price = fields.Monetary(string="Harga Jasa", currency_field="currency_id", compute="_compute_component_prices", store=True)
 
-    others_ids = fields.One2many(comodel_name="boq.others", inverse_name="work_unit_id", string="Satuan Pekerjaan - Lain-Lain")
+    others_ids = fields.One2many(
+        comodel_name="boq.others", 
+        inverse_name="work_unit_id", 
+        string="Satuan Pekerjaan - Lain-Lain"
+    )
     others_price = fields.Monetary(string="Harga Lain-Lain", currency_field="currency_id", compute="_compute_component_prices", store=True)
 
     work_unit_profit_id = fields.Many2one(comodel_name="boq.work_unit.profit", string="Persentase Keuntungan")    
@@ -63,9 +67,6 @@ class BoqWorkUnit(models.Model):
         for line in self:
             _logger.info(f"Currency: {self.currency_id}")
             # Compute material price
-            # line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
-            
-            # ini testing
             line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
             
             # Compute service price

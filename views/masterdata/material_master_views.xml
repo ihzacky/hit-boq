@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action Window -->
+    <record id="action_menu_material_master" model="ir.actions.act_window">
+        <field name="name">Material Master</field>
+        <field name="res_model">boq.material.master</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_material_master_tree" model="ir.ui.view">
+        <field name="name">boq.material.master.tree</field>
+        <field name="model">boq.material.master</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="material_code"/>
+                <field name="name"/>
+                <field name="material_unit"/>
+                <field name="list_price"/>
+                <field name="standard_price" optional="show"/>
+                <field name="uom_id" optional="show"/>
+                <field name="categ_id" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_material_master_form" model="ir.ui.view">
+        <field name="name">boq.material.master.form</field>
+        <field name="model">boq.material.master</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <field name="name" placeholder="Product Name"/>
+                        </h1>
+                        <div>
+                            <field name="material_code" placeholder="Material Code"/>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="General Information" name="general_information">
+                            <group>
+                                <group>
+                                    <field name="material_unit"/>
+                                    <field name="material_description"/>
+                                    <field name="categ_id"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                </group>
+                                <group>
+                                    <field name="list_price" string="Sales Price"/>
+                                    <field name="standard_price" string="Cost"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Material Lines" name="material_lines">
+                            <field name="material_line_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_material_master_kanban" model="ir.ui.view">
+        <field name="name">boq.material.master.kanban</field>
+        <field name="model">boq.material.master</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="material_code"/>
+                <field name="list_price"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('boq.material.master', 'image_1920', record.id.raw_value)" alt="Material Image"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div>
+                                    <field name="material_code"/>
+                                </div>
+                                <div>
+                                    Price: <field name="list_price" widget="monetary"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+</odoo>

@@ -53,9 +53,17 @@
         />
 
         <menuitem
-            id="menu_work_unit_master_material"
+            id="menu_work_unit_material_master"
             name="Material Master"    
-            action="action_menu_master_material"
+            action="action_menu_material_master"
+            parent="menu_work_unit"
+            sequence="14"
+        />
+
+        <menuitem
+            id="menu_work_unit_material_variant"
+            name="Material Variants"    
+            action="action_menu_material_variant"
             parent="menu_work_unit"
             sequence="14"
         />

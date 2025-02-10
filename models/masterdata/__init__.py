@@ -1,2 +1,2 @@
-from . import boq_master_material
-from . import boq_master_service
+from . import boq_material_master
+from . import boq_service_master

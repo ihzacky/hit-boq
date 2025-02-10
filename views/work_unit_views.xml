@@ -9,13 +9,12 @@
     <!-- tree -->
     <record id="menu_work_unit_tree" model="ir.ui.view">
         <field name="name">menu.work_unit.tree</field>
-        <!-- <field name="res_model">boq.work_unit</field> -->
+        <field name="model">boq.work_unit</field>
         <field name="arch" type="xml">
             <tree string="Work Unit Tree">
                 <field name="work_unit_code"/>
                 <field name="work_unit_name"/>
-                <field name="price_unit" />
-
+                <field name="price_unit"/>
             </tree>
         </field>
     </record>
@@ -61,13 +60,12 @@
                         <field name="material_ids" force_save="1">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <!-- <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/> -->
-                                <!-- <field name="master_material_id" widget="many2one" options="{'no_create': True}" string="Product"/> -->
-                                <field name="master_material_id" widget="many2one" string="Product"/>
+                                <field name="material_master_id" widget="many2one" string="Master Material"/>
+                                <field name="material_variant_id"/>
                                 <field name="material_name"/>
-                                <!-- <field name="material_code"/> -->
                                 <field name="material_quantity"/>
                                 <field name="material_price"/>
+                                <field name="active_price"/>
                                 <field name="product_base_price"/>
                             </tree>
                         </field>
