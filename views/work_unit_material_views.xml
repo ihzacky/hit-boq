@@ -14,7 +14,7 @@
             <tree string="Material Tree">
                 <field name="id"/>
                 <field name="material_code"/>
-                <field name="material_name"/>
+                <!-- <field name="material_name"/> -->
                 <field name="material_price"/>
 
             </tree>
@@ -37,7 +37,7 @@
 
                         <field name="id"/>
                         <field name="material_code"/>
-                        <field name="material_name"/>
+                        <!-- <field name="material_name"/> -->
                         <field name="material_price"/>
                     </group>
  

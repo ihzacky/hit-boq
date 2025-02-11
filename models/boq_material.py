@@ -1,16 +1,15 @@
 from odoo import models, fields, api
+from math import ceil
 
 class BoqMaterial(models.Model):
     _name = 'boq.material'
     _description = 'BoQ Satuan Pekerjaan - Material'
     _order = "sequence"
     # _rec_name = 'boq_materials'
-
-    material_name = fields.Char(string='Nama Material')
+    
     material_code = fields.Char(string='Kode Material')
     material_description = fields.Text(string='Deskripsi Material')
     material_unit = fields.Char(string='Unit dari Material')
-    # material final price
     material_price_final = fields.Monetary(string="Harga Final Material", currency_field="currency_id", compute="_compute_material_price_final")
     material_quantity = fields.Float(string="Quantity", default=1)
     
@@ -34,17 +33,17 @@ class BoqMaterial(models.Model):
         readonly=True,
     )    
 
-    # work_unit_profit_id = fields.Many2one(
-    #     comodel_name="boq.work_unit.profit", 
-    #     string="Profit Percentage",
-    #     related="work_unit_id.work_unit_profit_id",
-    #     store=True,
-    # )
+    material_uom = fields.Many2one(
+        comodel_name="uom.uom",
+        string="Unit",
+        related="product_id.uom_id",
+        readonly=True
+    )
 
     # pull price from master product
     material_base_price = fields.Float(
         string="Product Base Price",
-        compute='_compute_material_base_price',
+        compute='_get_material_base_price',
         store=True
     )
 
@@ -55,14 +54,16 @@ class BoqMaterial(models.Model):
     )
 
     @api.depends('product_id', 'product_id.lst_price')
-    def _compute_material_base_price(self):
+    def _get_material_base_price(self):
         for record in self:
             record.material_base_price = record.product_id.lst_price if record.product_id else 0.0
 
     @api.depends('material_base_price', 'work_unit_id.profit_percentage')
     def _compute_material_price(self):
         for record in self:
-            record.material_price = record.material_base_price + (record.material_base_price * record.work_unit_id.profit_percentage / 100)
+            profit_decimal = record.work_unit_id.profit_percentage / 100
+            base_calculation = record.material_base_price / (1 - profit_decimal)
+            record.material_price = ceil(base_calculation / 100) * 100
 
     @api.depends('material_quantity', 'material_base_price')
     def _compute_material_price_final(self):

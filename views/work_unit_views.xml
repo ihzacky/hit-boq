@@ -11,6 +11,7 @@
         <field name="name">menu.work_unit.tree</field>
         <field name="model">boq.work_unit</field>
         <field name="arch" type="xml">
+            
             <tree string="Work Unit Tree">
                 <field name="work_unit_code"/>
                 <field name="work_unit_name"/>
@@ -27,11 +28,12 @@
             <form string="BoQ Form">
                 <header>
                     <button string="Save" type="object" name="action_save" class="btn-primary"/>
+                    <button string="Refresh Prices" type="object" name="action_refresh" class="btn-secondary"/>
                 </header>
                 <sheet>
                     <group> 
                         <div class="oe_title">
-                            <h1 style="overflow: visible; white-space: nowrap;">
+                            <h1 style="white-space: nowrap;">
                                 <field name="work_unit_code" readonly="0" widget="label" />
                             </h1>
                         </div>
@@ -61,9 +63,10 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Material"/>
-                                <field name="material_name"/>
+                                <!-- <field name="material_name"/> -->
                                 <field name="material_code"/>
                                 <field name="material_quantity"/>
+                                <field name="material_uom"/>
                                 <field name="material_base_price"/>
                                 <field name="material_price"/>
                                 <field name="material_price_final"/>
@@ -77,11 +80,11 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Service"/>
-                                <field name="service_name"/>
-                                <field name="service_unit"/>
+                                <field name="additional_product_tag_ids" widget="many2many_tags"/>
                                 <field name="service_quantity"/>
-                                <field name="service_price"/>
+                                <field name="service_uom"/>
                                 <field name="service_base_price"/>
+                                <field name="service_price"/>
                                 
                             </tree>
                         </field>

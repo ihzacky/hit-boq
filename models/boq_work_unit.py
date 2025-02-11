@@ -41,7 +41,7 @@ class BoqWorkUnit(models.Model):
     currency_id = fields.Many2one(
         comodel_name="res.currency", 
         string="Currency", 
-        default=lambda self: self.env.ref('base.IDR'),
+        default=lambda   self: self.env.ref('base.IDR'),
         readonly=True,
     )
     
@@ -75,7 +75,13 @@ class BoqWorkUnit(models.Model):
             line.others_price = sum(line.others_ids.mapped('others_profit')) if line.others_ids else 0.0
 
     def action_refresh(self):
-        
+        self.ensure_one()
+        self.material_ids._compute_material_price()
+        # self.service_ids._compute_service_price()
+        # self.others_ids._compute_others_price()
+        self._compute_component_prices()
+        self._compute_price_unit()
+        return True 
 
     def action_save(self):
         self.ensure_one()
