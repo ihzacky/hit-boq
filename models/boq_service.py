@@ -13,12 +13,16 @@ class BoqService(models.Model):
 
     sequence = fields.Integer(string="Sequence", default="10")
 
-    work_unit_id = fields.Many2one(comodel_name='boq.work_unit', string='Satuan Pekerjaan Root')
+    work_unit_id = fields.Many2one(
+        comodel_name='boq.work_unit', 
+        string='Satuan Pekerjaan Root'
+    )
+
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product", 
+        domain=[('type', '=', 'service')],
     )
-
 
     currency_id = fields.Many2one(
         comodel_name="res.currency", 
