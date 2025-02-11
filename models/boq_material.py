@@ -6,7 +6,7 @@ class BoqMaterial(models.Model):
     _description = 'BoQ Satuan Pekerjaan - Material'
     _order = "sequence"
     # _rec_name = 'boq_materials'
-    
+
     material_code = fields.Char(string='Kode Material')
     material_description = fields.Text(string='Deskripsi Material')
     material_unit = fields.Char(string='Unit dari Material')
@@ -48,7 +48,7 @@ class BoqMaterial(models.Model):
     )
 
     material_price = fields.Float(
-        string="Product Subtotal",
+        string="Price After Profit",
         compute='_compute_material_price',
         store=True
     )

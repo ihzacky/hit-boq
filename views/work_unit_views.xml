@@ -84,6 +84,7 @@
                                 <field name="service_quantity"/>
                                 <field name="service_uom"/>
                                 <field name="service_base_price"/>
+                                <field name="service_pre_price"/>
                                 <field name="service_price"/>
                                 
                             </tree>
