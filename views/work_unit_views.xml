@@ -9,13 +9,13 @@
     <!-- tree -->
     <record id="menu_work_unit_tree" model="ir.ui.view">
         <field name="name">menu.work_unit.tree</field>
-        <!-- <field name="res_model">boq.work_unit</field> -->
+        <field name="model">boq.work_unit</field>
         <field name="arch" type="xml">
+            
             <tree string="Work Unit Tree">
                 <field name="work_unit_code"/>
                 <field name="work_unit_name"/>
                 <field name="price_unit" />
-
             </tree>
         </field>
     </record>
@@ -28,18 +28,12 @@
             <form string="BoQ Form">
                 <header>
                     <button string="Save" type="object" name="action_save" class="btn-primary"/>
+                    <button string="Refresh Prices" type="object" name="action_refresh" class="btn-secondary"/>
                 </header>
                 <sheet>
-                    <!-- <group> 
-                        <div class="oe_title">
-                            <h1>
-                                <field name="work_unit_code" readonly="0"/>
-                            </h1>
-                        </div>
-                    </group> -->
                     <group> 
                         <div class="oe_title">
-                            <h1 style="overflow: visible; white-space: nowrap; text-overflow: ellipsis;">
+                            <h1 style="white-space: nowrap;">
                                 <field name="work_unit_code" readonly="0" widget="label" />
                             </h1>
                         </div>
@@ -56,17 +50,26 @@
                         <field name="updated_date" widget="datetime" readonly="1"/>
                         <field name="updated_by" readonly="1"/>
                     </group>
+
+                    <group class="bg-light p-4 mb-4">
+                        <!-- <field name="work_unit_profit_id">
+                        <field name="work_unit_profit_percentage" widget="percentage"/> -->
+                        <field name="profit_percentage"/>
+                        <!-- </field> -->
+                    </group>
                     
                     <group class="bg-light p-4 mb-4">
                         <field name="material_ids" force_save="1">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
-                                <field name="material_name"/>
+                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Material"/>
+                                <!-- <field name="material_name"/> -->
                                 <field name="material_code"/>
                                 <field name="material_quantity"/>
+                                <field name="material_uom"/>
+                                <field name="material_base_price"/>
                                 <field name="material_price"/>
-                                <field name="product_base_price"/>
+                                <field name="material_price_final"/>
                             </tree>
                         </field>
                         <field name="materials_price"/>
@@ -76,12 +79,13 @@
                         <field name="service_ids">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
-                                <field name="service_name"/>
-                                <field name="service_unit"/>
+                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Service"/>
+                                <field name="additional_product_tag_ids" widget="many2many_tags"/>
                                 <field name="service_quantity"/>
-                                <field name="service_price"/>
+                                <field name="service_uom"/>
                                 <field name="service_base_price"/>
+                                <field name="service_pre_price"/>
+                                <field name="service_price"/>
                                 
                             </tree>
                         </field>
@@ -91,7 +95,7 @@
                     <group class="bg-light p-4 mb-4">
                         <field name="others_ids">
                             <tree editable="bottom">
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Product"/>
+                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Others"/>
                                 <field name="others_profit"/>
                                 <field name="others_others"/>
                             </tree>
