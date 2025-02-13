@@ -6,8 +6,9 @@ _logger = logging.getLogger(__name__)
 class BoqWorkUnit(models.Model):
     _name = 'boq.work_unit'
     _description = 'BoQ Satuan Pekerjaan - Root'
-    # _rec_name = 'boq_satuan_pekerjaan'
+    _rec_name = 'work_unit_code'
 
+    sequence = fields.Integer(string="Sequence", default="1")
     work_unit_code = fields.Char(string='Kode Pekerjaan')
     work_unit_name = fields.Char(string='Nama Pekerjaan')
     updated_date = fields.Datetime(string="Updated Date") 
@@ -44,11 +45,17 @@ class BoqWorkUnit(models.Model):
         default=lambda   self: self.env.ref('base.IDR'),
         readonly=True,
     )
-    
-    boq_root_id = fields.Many2many(
-        comodel_name='boq.root',
-        string='BOQ Roots'
+
+    work_unit_line_ids = fields.One2many(
+        comodel_name='boq.work_unit.line',
+        inverse_name='work_unit_id',
+        string='BOQ Work Unit Lines'
     )
+
+    # boq_root_id = fields.Many2many(
+    #     comodel_name='boq.root',
+    #     string='BOQ Roots'
+    # )
     
     @api.depends('materials_price', 'services_price', 'others_price')
     def _compute_price_unit(self):

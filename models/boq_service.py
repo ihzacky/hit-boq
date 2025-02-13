@@ -86,7 +86,8 @@ class BoqService(models.Model):
                 record.service_price = unit_price * record.service_quantity
             else:
                 # Set pre_price to False for non-profit services
-                record.service_pre_price = False
+                # record.service_pre_price = False
+                record.service_pre_price = record.service_base_price
                 # Regular price calculation
                 record.service_price = record.service_base_price * record.service_quantity
 
