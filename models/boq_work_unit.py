@@ -14,7 +14,7 @@ class BoqWorkUnit(models.Model):
     updated_date = fields.Datetime(string="Updated Date") 
     updated_by = fields.Char(string="Updated By")
     
-    price_unit = fields.Monetary(string="Harga Satuan Pekerjaan", currency_field="currency_id", compute="_compute_price_unit")
+    price_unit = fields.Monetary(string="Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit")
     
     material_ids = fields.One2many(
         comodel_name='boq.material', 
@@ -28,7 +28,7 @@ class BoqWorkUnit(models.Model):
         inverse_name="work_unit_id", 
         string='Satuan Pekerjaan - Jasa'
     )
-    services_price = fields.Monetary(string="Harga Jasa", currency_field="currency_id", compute="_compute_component_prices", store=True)
+    services_price = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", store=True)
 
     others_ids = fields.One2many(
         comodel_name="boq.others", 
@@ -51,48 +51,44 @@ class BoqWorkUnit(models.Model):
         inverse_name='work_unit_id',
         string='BOQ Work Unit Lines'
     )
-
-    # boq_root_id = fields.Many2many(
-    #     comodel_name='boq.root',
-    #     string='BOQ Roots'
-    # )
     
     @api.depends('materials_price', 'services_price', 'others_price')
     def _compute_price_unit(self):
         for line in self:
-            # Ensure we have valid float values for all components
             materials_price = line.materials_price or 0.0
             services_price = line.services_price or 0.0
             others_price = line.others_price or 0.0
             
-            # Calculate total price
+            # calculate total price
             line.price_unit = materials_price + services_price + others_price
     
     @api.depends('material_ids', 'service_ids', 'others_ids')
     def _compute_component_prices(self):
         for line in self:
             _logger.info(f"Currency: {self.currency_id}")
-            # Compute material price
             line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
-            
-            # Compute service price
             line.services_price = sum(line.service_ids.mapped('service_price')) if line.service_ids else 0.0
-            
-            # Compute others price
-            line.others_price = sum(line.others_ids.mapped('others_profit')) if line.others_ids else 0.0
+            line.others_price = sum(line.others_ids.mapped('others_price_final')) if line.others_ids else 0.0
+
+    @api.onchange('work_unit_code')
+    def _onchange_work_unit_code(self):
+        if self.work_unit_code and not self.others_ids:
+            self.others_ids = [
+                (0, 0, {'others_name': 'Keuntungan'}),
+                (0, 0, {'others_name': 'Lain-lain'}),
+            ]
 
     def action_refresh(self):
         self.ensure_one()
-        self.material_ids._compute_material_price()
-        # self.service_ids._compute_service_price()
-        # self.others_ids._compute_others_price()
-        self._compute_component_prices()
+        self.material_ids.recompute_material_price()
+        self.service_ids.recompute_service_price
+        self.others_ids.recompute_others_price()
+        self._compute_component_prices() 
         self._compute_price_unit()
         return True 
 
     def action_save(self):
         self.ensure_one()
-        # Update the updated_date and updated_by fields
         self.write({
             'updated_date': fields.Datetime.now(),
             'updated_by': self.env.user.name
@@ -109,4 +105,4 @@ class BoqWorkUnit(models.Model):
 
 
 
-    
+

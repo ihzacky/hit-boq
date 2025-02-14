@@ -4,7 +4,7 @@ from math import ceil
 class BoqMaterial(models.Model):
     _name = 'boq.material'
     _description = 'BoQ Satuan Pekerjaan - Material'
-    _order = "sequence"
+    _order = "sequence, id"
     # _rec_name = 'boq_materials'
 
     material_code = fields.Char(string='Kode Material')
@@ -13,7 +13,7 @@ class BoqMaterial(models.Model):
     material_price_final = fields.Monetary(string="Harga Final Material", currency_field="currency_id", compute="_compute_material_price_final")
     material_quantity = fields.Float(string="Quantity", default=1)
     
-    sequence = fields.Integer(string="Sequence", default="10")
+    sequence = fields.Integer(string="Sequence", default="1")
 
     product_id = fields.Many2one(
         comodel_name="product.product", 
@@ -70,5 +70,8 @@ class BoqMaterial(models.Model):
         for record in self:
             record.material_price_final = record.material_quantity * record.material_price
 
-
+    def recompute_material_price(self):
+        for record in self:
+            record._compute_material_price()
+            record._compute_material_price_final()
 

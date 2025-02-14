@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class BoqRoot(models.Model):
     _name = 'boq.root'
     _description = 'BoQ Root'
-
+    _rec_name = 'boq_code'
 
     boq_code = fields.Char(string='Kode BoQ')
     boq_name = fields.Char(string='Nama')
@@ -42,7 +42,7 @@ class BoqRoot(models.Model):
         'work_unit_line_ids', 
         'work_unit_line_ids.material_price_final', 
         'work_unit_line_ids.service_price_final', 
-        'work_unit_line_ids.others_price_after_margin_final',
+        'work_unit_line_ids.others_price_final',
         'work_unit_line_ids.material_price_after_margin_final',
         'work_unit_line_ids.service_price_after_margin_final',
 
@@ -56,7 +56,7 @@ class BoqRoot(models.Model):
         for record in self:
             material_price_total = sum(record.work_unit_line_ids.mapped('material_price_final'))
             installation_price_total = sum(record.work_unit_line_ids.mapped('service_price_final'))
-            maintenance_price_total = sum(record.work_unit_line_ids.mapped('others_price_after_margin_final'))
+            maintenance_price_total = sum(record.work_unit_line_ids.filtered(lambda x: x.work_unit_line_code.startswith('MNT')).mapped('service_price_final'))
 
             record.material_price_total = material_price_total
             record.installation_price_total = installation_price_total
