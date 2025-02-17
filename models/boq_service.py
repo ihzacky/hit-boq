@@ -7,11 +7,11 @@ class BoqService(models.Model):
     _order = "sequence, id"
     # _rec_name = 'boq_jasa'
 
-    service_name = fields.Char(string='Nama Jasa')
+    service_name = fields.Char(string='Nama Jasa', tracking=True, required=True)
     service_unit = fields.Char(string='Unit jasa')
     service_price = fields.Float(string='Final Price', compute='_compute_service_price_final')
-    service_pre_price = fields.Float(string='Price After Profit', compute='_compute_service_price')
-    service_base_price = fields.Float(string='Base Price', compute='_get_service_base_price')
+    service_pre_price = fields.Monetary(string='Price After Profit', currency_field='currency_id', compute='_compute_service_price')
+    service_base_price = fields.Monetary(string='Base Price', currency_field='currency_id', compute='_get_service_base_price')
     
 
     service_quantity = fields.Float(string='Quantity', default=1)

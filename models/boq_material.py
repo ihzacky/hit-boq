@@ -19,6 +19,7 @@ class BoqMaterial(models.Model):
         comodel_name="product.product", 
         string="Product",
         domain=[('type', '=', 'consu')], 
+        tracking=True,
     )
     
     work_unit_id = fields.Many2one(
@@ -37,20 +38,25 @@ class BoqMaterial(models.Model):
         comodel_name="uom.uom",
         string="Unit",
         related="product_id.uom_id",
-        readonly=True
+        readonly=True,
+        tracking=True,
     )
 
     # pull price from master product
-    material_base_price = fields.Float(
+    material_base_price = fields.Monetary(
         string="Product Base Price",
+        currency_field='currency_id',
         compute='_get_material_base_price',
-        store=True
+        store=True,
+        tracking=True,
     )
 
-    material_price = fields.Float(
+    material_price = fields.Monetary(
         string="Price After Profit",
+        currency_field='currency_id',
         compute='_compute_material_price',
-        store=True
+        store=True,
+        tracking=True,
     )
 
     @api.depends('product_id', 'product_id.lst_price')

@@ -32,7 +32,7 @@ class BoqOthers(models.Model):
             if record.others_name and record.others_name.lower() == 'Lain-lain':
                 keuntungan_rec = self.search(
                     [('id', '<', record.id), ('others_name', '=', 'Keuntungan')],
-                    order='id desc',
+                    order='id desc',    
                     limit=1
                 )
                 if keuntungan_rec:

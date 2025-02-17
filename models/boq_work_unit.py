@@ -6,7 +6,9 @@ _logger = logging.getLogger(__name__)
 class BoqWorkUnit(models.Model):
     _name = 'boq.work_unit'
     _description = 'BoQ Satuan Pekerjaan - Root'
+    _inherit = 'mail.thread', 'mail.activity.mixin'
     _rec_name = 'work_unit_code'
+    _order = 'sequence, id'
 
     sequence = fields.Integer(string="Sequence", default="1")
     work_unit_code = fields.Char(string='Kode Pekerjaan')
@@ -14,28 +16,28 @@ class BoqWorkUnit(models.Model):
     updated_date = fields.Datetime(string="Updated Date") 
     updated_by = fields.Char(string="Updated By")
     
-    price_unit = fields.Monetary(string="Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit")
+    price_unit = fields.Monetary(string="Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True)
     
     material_ids = fields.One2many(
         comodel_name='boq.material', 
         inverse_name="work_unit_id", 
         string='Satuan Pekerjaan - Material'
     )
-    materials_price = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", store=True)
+    materials_price = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
 
     service_ids = fields.One2many(
         comodel_name='boq.service', 
         inverse_name="work_unit_id", 
         string='Satuan Pekerjaan - Jasa'
     )
-    services_price = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", store=True)
+    services_price = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
 
     others_ids = fields.One2many(
         comodel_name="boq.others", 
         inverse_name="work_unit_id", 
         string="Satuan Pekerjaan - Lain-Lain"
     )
-    others_price = fields.Monetary(string="Harga Lain-Lain", currency_field="currency_id", compute="_compute_component_prices", store=True)
+    others_price = fields.Monetary(string="Harga Lain-Lain", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
 
     profit_percentage = fields.Integer(string="Profit Percentage", tracking=True, default=15)    
 
@@ -49,7 +51,8 @@ class BoqWorkUnit(models.Model):
     work_unit_line_ids = fields.One2many(
         comodel_name='boq.work_unit.line',
         inverse_name='work_unit_id',
-        string='BOQ Work Unit Lines'
+        string='BOQ Work Unit Lines',
+        tracking=True,
     )
     
     @api.depends('materials_price', 'services_price', 'others_price')

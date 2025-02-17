@@ -50,8 +50,8 @@
                         </group>
                     </group>
 
-                    <group class="bg-light p-4 mb-4" string="Material">
-                        <field name="material_ids" force_save="1" nolabel="1" colspan="2">
+                    <group class="p-4 mb-4" string="Material">
+                        <field name="material_ids" force_save="1" nolabel="1" colspan="2" context="{'default_display_type': False}">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>
@@ -66,7 +66,7 @@
                         <field name="materials_price"/>
                     </group>
                     
-                    <group class="bg-light p-4 mb-4" string="Instalasi">
+                    <group class="p-4 mb-4" string="Instalasi">
                         <field name="service_ids" force_save="1" nolabel="1" colspan="2">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
@@ -83,7 +83,7 @@
                         <field name="services_price"/>
                     </group>
                     
-                    <group class="bg-light p-4 mb-4" string="Lain-Lain">
+                    <group class="p-4 mb-4" string="Lain-Lain">
                         <field name="others_ids" force_save="1" nolabel="1" colspan="2">
                             <tree edit="false" create="false" delete="false" readonly="true">
                                 <!-- <field name="product_id" widget="many2one" options="{'no_create': True}" string="Others"/> -->
@@ -97,22 +97,12 @@
                         </field>
                         <field name="others_price"/>
                     </group>
-                    
-                    <!-- <notebook>
-                        <page string ="Material" name="material">
-                            <field name="material_ids" mode="tree"/>
-                        </page>
-
-                        <page name="service" string="Jasa">
-                            <field name="service_ids" />
-                        </page>
-                        
-                        <page name="others" string="Lain-lain">
-                            <field name="others_ids" />
-                        </page>
-
-                    </notebook> -->
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
