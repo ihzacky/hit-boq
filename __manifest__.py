@@ -6,7 +6,7 @@
     "website": "https://yourcompany.com",
     "version": "1.0.0",
     "category": "Customizations",
-    "depends": ["base", "product"],
+    "depends": ["base", "product", "mail"],
     "data": [
         "views/boq_root_views.xml",
         "views/work_unit_views.xml",

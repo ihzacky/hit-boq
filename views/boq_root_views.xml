@@ -26,14 +26,18 @@
         <field name="arch" type="xml">
             <form string="BoQ Form">
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="boq_code"/>
+                        </h1>
+                    </div>
                     <group>
                         <field name="boq_name"/>
                         <field name="material_margin"/>
                         <field name="installation_margin"/>
                     </group>
-
-                    <group>
-                        <field name="work_unit_line_ids" widget="section_and_note_one2many" context="{'default_display_type': False}">
+                    <group string="Pekerjaan">
+                        <field name="work_unit_line_ids" widget="section_and_note_one2many" mode="tree" context="{'default_display_type': False}">
                             <tree editable="bottom" string="Work Unit Line">
                                 <control>
                                     <create 
@@ -52,13 +56,11 @@
                                     />
                                 </control>                                
                                 <field name="sequence" widget="handle"/>
-                                <field name="display_type" column_invisible="1"/>
-
                                 <field name="work_unit_id" required="not display_type"/>
-                                <field name="work_unit_line_name"/>
-                                <field name="work_unit_line_quantity" required="not display_type"/>
-                                <field name="work_unit_line_uom" required="not display_type"/>
-                                
+                                <field name="work_unit_line_name" widget="section_and_note_text" optional="show"/>
+                                <field name="work_unit_line_quantity"/>
+                                <field name="work_unit_line_uom"/>
+                                <field name="display_type" column_invisible="1"/>
                             </tree>
                         </field>
                         <field name="price_final" readonly="1" invisible="1"/>
@@ -74,7 +76,7 @@
                                             <field name="work_unit_line_code"/>
                                             <field name="material_base_price_after_margin" string="Material"/>
                                             <field name="service_base_price_after_margin" string="Instalasi"/>
-                                            <field name="others_base_price_after_margin" string="Lain-Lain"/>
+                                            <field name="others_base_price" string="Lain-Lain"/>
                                         </tree>
                                     </field>
                                 </group>
@@ -84,7 +86,7 @@
                                             <field name="work_unit_line_code"/>
                                             <field name="material_price_after_margin_final" string="Material"/>
                                             <field name="service_price_after_margin_final" string="Instalasi"/>
-                                            <field name="others_price_after_margin_final" string="Lain-Lain"/>
+                                            <field name="others_price_final" string="Lain-Lain"/>
                                         </tree>
                                     </field>
                                 </group>
@@ -96,7 +98,7 @@
                                             <field name="work_unit_line_code"/>
                                             <field name="material_base_price" string="Material"/>
                                             <field name="service_base_price" string="Instalasi"/>
-                                            <!-- <field name="others_base_price" string="Lain-Lain"/> -->
+                                            <field name="others_base_price" string="Lain-Lain"/>
                                         </tree>
                                     </field>
                                 </group>
@@ -106,23 +108,33 @@
                                             <field name="work_unit_line_code"/>
                                             <field name="material_price_final" string="Material"/>
                                             <field name="service_price_final" string="Instalasi"/>
-                                            <!-- <field name="others_price_final" string="Lain-Lain"/> -->
+                                            <field name="others_price_final" string="Lain-Lain"/>
                                         </tree>
                                     </field>
                                 </group>
+                            </group>
+                            <group string="Total Harga">
+                                <field name="material_price_total" widget="monetary"/>
+                                <field name="installation_price_total" widget="monetary"/>
+                                <field name="maintenance_price_total" widget="monetary"/>
+                                <field name="price_final" widget="monetary"/>
                             </group>
                         </page>
 
                     </notebook>
    
-                    <group name="name" string="Total Harga">
-                        <!-- <span>Total Harga</span> -->
+                    <!-- <group name="name" string="Total Harga">
                         <field name="material_price_total"/>
                         <field name="installation_price_total"/>
                         <field name="maintenance_price_total"/>
                         <field name="price_final" />
-                    </group>
+                    </group> -->
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>

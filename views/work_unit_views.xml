@@ -31,39 +31,30 @@
                     <button string="Refresh Prices" type="object" name="action_refresh" class="btn-secondary"/>
                 </header>
                 <sheet>
-                    <group> 
-                        <div class="oe_title">
-                            <h1 style="white-space: nowrap;">
-                                <field name="work_unit_code" readonly="0" widget="label" />
-                            </h1>
-                        </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="work_unit_code"/>
+                        </h1>
+                    </div>
+
+                    <group name="top">
+                        <group>
+                            <field name="work_unit_name"/>
+                            <field name="profit_percentage"/>
+                            <field name="price_unit"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="updated_date" widget="datetime" readonly="1"/>
+                            <field name="updated_by" readonly="1"/>
+                        </group>
                     </group>
 
-                    <group class="bg-light p-4 mb-4">
-                        <!-- <field name="work_unit_code"/> -->
-                        <field name="work_unit_name"/>
-                        <field name="price_unit"/>
-                        <field name="currency_id" invisible="1"/>
-                    </group>
-                    
-                    <group class="bg-light p-4 mb-4">
-                        <field name="updated_date" widget="datetime" readonly="1"/>
-                        <field name="updated_by" readonly="1"/>
-                    </group>
-
-                    <group class="bg-light p-4 mb-4">
-                        <!-- <field name="work_unit_profit_id">
-                        <field name="work_unit_profit_percentage" widget="percentage"/> -->
-                        <field name="profit_percentage"/>
-                        <!-- </field> -->
-                    </group>
-                    
-                    <group class="bg-light p-4 mb-4">
-                        <field name="material_ids" force_save="1">
+                    <group class="p-4 mb-4" string="Material">
+                        <field name="material_ids" force_save="1" nolabel="1" colspan="2" context="{'default_display_type': False}">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Material"/>
-                                <!-- <field name="material_name"/> -->
+                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>
                                 <field name="material_code"/>
                                 <field name="material_quantity"/>
                                 <field name="material_uom"/>
@@ -75,11 +66,11 @@
                         <field name="materials_price"/>
                     </group>
                     
-                    <group class="bg-light p-4 mb-4">
-                        <field name="service_ids">
+                    <group class="p-4 mb-4" string="Instalasi">
+                        <field name="service_ids" force_save="1" nolabel="1" colspan="2">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Service"/>
+                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>
                                 <field name="additional_product_tag_ids" widget="many2many_tags"/>
                                 <field name="service_quantity"/>
                                 <field name="service_uom"/>
@@ -92,134 +83,26 @@
                         <field name="services_price"/>
                     </group>
                     
-                    <group class="bg-light p-4 mb-4">
-                        <field name="others_ids">
-                            <tree editable="bottom">
-                                <field name="product_id" widget="many2one" options="{'no_create': True}" string="Others"/>
-                                <field name="others_profit"/>
-                                <field name="others_others"/>
+                    <group class="p-4 mb-4" string="Lain-Lain">
+                        <field name="others_ids" force_save="1" nolabel="1" colspan="2">
+                            <tree edit="false" create="false" delete="false" readonly="true">
+                                <!-- <field name="product_id" widget="many2one" options="{'no_create': True}" string="Others"/> -->
+                                <field name="others_name" string="Item"/>   
+                                <field name="others_quantity"/>   
+                                <field name="others_uom"/>   
+                                <field name="others_base_price"/>   
+                                <field name="others_price_final"/>
+                                
                             </tree>
                         </field>
                         <field name="others_price"/>
                     </group>
-                    
-                    <notebook>
-                        <page string ="Material" name="material">
-                            <field name="material_ids" mode="tree"/>
-                            
-                            <!-- <field
-                                name="work_unit_name"
-                                widget="section_and_note_one2many"
-                                mode="tree">
-                                    
-                                  
-
-                                <tree
-                                    string="Sales Order Lines"
-                                    editable="bottom"
-                                    limit="200"
-                                >
-                                    <field name="sequence" widget="handle" />
-                                    <field name="display_type" column_invisible="True"/>
-                                    <field name="product_uom_category_id" column_invisible="True"/>
-                                    <field name="product_type" column_invisible="True"/>
-                                    <field name="product_updatable" column_invisible="True"/>
-                                    <field name="is_downpayment" column_invisible="True"/>
-                                    <field
-                                        name="id"
-                                        readonly="not product_updatable"
-                                        required="not display_type"
-                                        force_save="1"
-                                        context="{
-                                            'partner_id': parent.partner_id,
-                                            'quantity': product_uom_qty,
-                                            'pricelist': parent.pricelist_id,
-                                            'uom':product_uom,
-                                            'company_id': parent.company_id,
-                                            'default_lst_price': price_unit,
-                                            'default_description_sale': name
-                                        }"
-                                        options="{
-                                            'no_open': True,
-                                        }"
-                                        domain="[('sale_ok', '=', True)]"
-                                        widget="sol_product_many2one"/>
-                                    <field name="material_name"
-                                        string="Material"
-                                        column_invisible="True"
-                                        readonly="not product_updatable"
-                                        required="not display_type"
-                                        context="{
-                                            'partner_id': parent.partner_id,
-                                            'quantity': product_uom_qty,
-                                            'pricelist': parent.pricelist_id,
-                                            'uom':product_uom,
-                                            'company_id': parent.company_id,
-                                            'default_list_price': price_unit,
-                                            'default_description_sale': name
-                                        }"
-                                        options="{
-                                            'no_open': True,
-                                        }"
-                                        domain="[('sale_ok', '=', True)]"
-                                        widget="sol_product_many2one"
-                                        placeholder="Type to find a product..."/>
-                                    <field name="name" widget="section_and_note_text" optional="show"/>
-                                    <field name="analytic_distribution" widget="analytic_distribution"
-                                            optional="hide"
-                                            groups="analytic.group_analytic_accounting"
-                                            options="{'product_field': 'id', 'business_domain': 'sale_order', 'amount_field': 'price_subtotal'}"/>
-                                   
-                              
-                                    <field name="qty_to_invoice" column_invisible="True"/>
-                                    
-                                    <field
-                                        name="customer_lead"
-                                        optional="hide"
-                                        readonly="parent.state not in ['draft', 'sent', 'sale'] or is_downpayment"/>
-                                    <field name="product_packaging_qty" invisible="not id or not product_packaging_id" groups="product.group_stock_packaging" optional="show"/>
-                                    <field name="product_packaging_id" invisible="not id" context="{'default_id': id, 'tree_view_ref':'product.product_packaging_tree_view', 'form_view_ref':'product.product_packaging_form_view'}" groups="product.group_stock_packaging" optional="show"/>
-                                    <field
-                                        name="price_unit"
-                                        readonly="qty_invoiced &gt; 0"/>
-                                    <field
-                                        name="tax_id"
-                                        widget="many2many_tags"
-                                        options="{'no_create': True}"
-                                        domain="[('type_tax_use', '=', 'sale'), ('company_id', 'parent_of', parent.company_id), ('country_id', '=', parent.tax_country_id)]"
-                                        context="{'active_test': True}"
-                                        readonly="qty_invoiced &gt; 0 or is_downpayment"
-                                        optional="show"/>
-                                    <field name="discount" string="Disc.%" groups="product.group_discount_per_so_line" optional="show"/>
-                                    <field name="is_downpayment" column_invisible="True"/>
-                                    <field name="price_subtotal" string="Tax excl." invisible="is_downpayment"/>
-                                    <field name="price_total"
-                                        string="Tax incl."
-                                        column_invisible="parent.tax_calculation_rounding_method == 'round_globally'"
-                                        invisible="is_downpayment"
-                                        optional="hide"/>
-                                    <field name="tax_calculation_rounding_method" column_invisible="True"/>
-                                    <field name="state" column_invisible="True"/>
-                                    <field name="invoice_status" column_invisible="True"/>
-                                    <field name="currency_id" column_invisible="True"/>
-                                    <field name="price_tax" column_invisible="True"/>
-                                    <field name="company_id" column_invisible="True"/>
-                                </tree>
-                                
-                            </field> -->
-                            
-                        </page>
-
-                        <page name="service" string="Jasa">
-                            <field name="service_ids" />
-                        </page>
-                        
-                        <page name="others" string="Lain-lain">
-                            <field name="others_ids" />
-                        </page>
-
-                    </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>

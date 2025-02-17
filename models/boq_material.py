@@ -4,7 +4,7 @@ from math import ceil
 class BoqMaterial(models.Model):
     _name = 'boq.material'
     _description = 'BoQ Satuan Pekerjaan - Material'
-    _order = "sequence"
+    _order = "sequence, id"
     # _rec_name = 'boq_materials'
 
     material_code = fields.Char(string='Kode Material')
@@ -13,12 +13,13 @@ class BoqMaterial(models.Model):
     material_price_final = fields.Monetary(string="Harga Final Material", currency_field="currency_id", compute="_compute_material_price_final")
     material_quantity = fields.Float(string="Quantity", default=1)
     
-    sequence = fields.Integer(string="Sequence", default="10")
+    sequence = fields.Integer(string="Sequence", default="1")
 
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product",
         domain=[('type', '=', 'consu')], 
+        tracking=True,
     )
     
     work_unit_id = fields.Many2one(
@@ -37,20 +38,25 @@ class BoqMaterial(models.Model):
         comodel_name="uom.uom",
         string="Unit",
         related="product_id.uom_id",
-        readonly=True
+        readonly=True,
+        tracking=True,
     )
 
     # pull price from master product
-    material_base_price = fields.Float(
+    material_base_price = fields.Monetary(
         string="Product Base Price",
+        currency_field='currency_id',
         compute='_get_material_base_price',
-        store=True
+        store=True,
+        tracking=True,
     )
 
-    material_price = fields.Float(
+    material_price = fields.Monetary(
         string="Price After Profit",
+        currency_field='currency_id',
         compute='_compute_material_price',
-        store=True
+        store=True,
+        tracking=True,
     )
 
     @api.depends('product_id', 'product_id.lst_price')
@@ -70,5 +76,8 @@ class BoqMaterial(models.Model):
         for record in self:
             record.material_price_final = record.material_quantity * record.material_price
 
-
+    def recompute_material_price(self):
+        for record in self:
+            record._compute_material_price()
+            record._compute_material_price_final()
 

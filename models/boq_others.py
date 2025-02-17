@@ -3,14 +3,15 @@ from odoo import models, fields, api
 class BoqOthers(models.Model):
     _name = 'boq.others'
     _description = 'BoQ Satuan Pekerjaan - Lainnya'
-    # _rec_name = 'boq_others'
+    _rec_name = 'others_name'
 
-    others_profit = fields.Monetary(string="Keuntungan", currency_fields="currency_id")
-    others_others = fields.Monetary(string="Lain-lain (Kendaraan, dll)", currency_fields="currency_id", compute="")
+    others_name = fields.Char(string="Nama Lain-Lain")
+    others_base_price = fields.Monetary(string="Harga/Unit", currency_fields="currency_id", compute="_compute_others_base_price")
+    others_price_final = fields.Monetary(string="Harga", currency_fields="currency_id", compute="_compute_others_price_final")
+    others_quantity = fields.Float(string="Quantity", default=0)
+    others_uom = fields.Char(string="Unit", default="%", readonly=True)
 
-    # work_unit_id = fields.Many2one(comodel_name="boq.work_unit", string="Work Unit", compute="compute_others", inverse="stage_inverse")
     work_unit_id = fields.Many2one(comodel_name="boq.work_unit", string="Work Unit")
-    # others_ids = fields.One2many(comodel_name='boq.work_unit', inverse_name='others_id')
 
     product_id = fields.Many2one(
         comodel_name="product.product", 
@@ -24,18 +25,30 @@ class BoqOthers(models.Model):
         readonly=True,
     )    
 
-    # @api.depends('others_ids')
-    # def compute_others(self):
-    #     if len(self.others_ids) > 0:
-    #         self.work_unit_id = self.others_ids[0]
+    @api.depends('work_unit_id', 'others_name')
+    def _compute_others_base_price(self):
+        for record in self:
+            # If the record name is "lain-lain", check for the previous record named "keuntungan"
+            if record.others_name and record.others_name.lower() == 'Lain-lain':
+                keuntungan_rec = self.search(
+                    [('id', '<', record.id), ('others_name', '=', 'Keuntungan')],
+                    order='id desc',    
+                    limit=1
+                )
+                if keuntungan_rec:
+                    record.others_base_price = keuntungan_rec.others_base_price
+                    continue
+            if record.work_unit_id:
+                record.others_base_price = record.work_unit_id.materials_price + record.work_unit_id.services_price
+            else:
+                record.others_base_price = 0
 
-    # def stage_inverse(self):
-    #     if len(self.others_ids) > 0:
-    #         # delete previous reference
-    #         stage = self.env['hr.job'].browse(self.others_ids[0].id)
-    #         asset.other_id = False
-    #     # set new reference
-    #     self.work_unit_id.other_id = self
+    @api.depends('others_base_price', 'others_quantity')
+    def _compute_others_price_final(self):
+        for record in self:
+            record.others_price_final = record.others_base_price * record.others_quantity * 1/100
 
-    
-
+    def recompute_others_price(self):
+        for record in self:
+            record._compute_others_base_price()
+            record._compute_others_price_final()

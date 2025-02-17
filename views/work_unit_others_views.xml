@@ -13,9 +13,8 @@
         <field name="arch" type="xml">
             <tree string="others Tree">
                 <field name="id"/>
-                <field name="others_profit"/>
-                <field name="others_others"/>
-
+                <field name="others_base_price"/>
+                <field name="others_price_final" widget="monetary"/>
             </tree>
         </field>
     </record>
@@ -33,8 +32,8 @@
                 </sheet>
                 <sheet>
                     <group class="bg-light p-4 mb-4">
-                        <field name="others_profit"/>
-                        <field name="others_others" widget="monetary"/>
+                        <field name="others_base_price"/>
+                        <field name="others_price_final" widget="monetary"/>
                     </group>
  
                 </sheet>
