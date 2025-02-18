@@ -10,11 +10,11 @@ class BoqWorkUnitLine(models.Model):
 
     _sql_constraints = [
         ('accountable_required_fields',
-            "CHECK(display_type IS NOT NULL OR (work_unit_id IS NOT NULL AND work_unit_line_quantity IS NOT NULL))",
-            "Missing required fields on accountable work unit line."),
+         "CHECK(display_type IS NOT NULL OR (work_unit_id IS NOT NULL AND work_unit_line_quantity IS NOT NULL))",
+         "Missing required fields on accountable work unit line."),
         ('non_accountable_null_fields',
-            "CHECK(display_type IS NULL OR (work_unit_id IS NULL AND work_unit_line_quantity = 0))",
-            "Forbidden values on non-accountable work unit line."),
+         "CHECK(display_type IS NULL OR (work_unit_id IS NULL AND work_unit_line_quantity = 0))",
+         "Forbidden values on non-accountable work unit line.")
     ]
 
     sequence = fields.Integer(string="Sequence", default=1)
@@ -71,20 +71,20 @@ class BoqWorkUnitLine(models.Model):
     )
 
     @api.model_create_multi
-    # def create(self, vals_list):
-    #     for vals in vals_list:
-    #         if vals.get('display_type', self.default_get(['display_type'])['display_type']):
-    #             vals.update(work_unit_id=False, work_unit_line_quantity=0, work_unit_line_uom=False)
-    #     return super().create(vals_list)
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('display_type'):
-                vals.update(work_unit_id=False, work_unit_line_quantity=0, work_unit_line_uom=False)
+                # For section/note lines, clear out business fields
+                vals.update(work_unit_id=False, 
+                           work_unit_line_quantity=0, 
+                           work_unit_line_uom=False)
         return super().create(vals_list)
     
     def write(self, values):
-        if 'display_type' in values and self.filtered(lambda line: line.display_type != values.get('display_type')):
-            raise UserError(_("You cannot change the type of a line. Instead, delete the current line and create a new one."))
+        if 'display_type' in values and self.filtered(
+            lambda line: line.display_type != values.get('display_type')
+        ):
+            raise UserError(_("You cannot change the type of a line..."))
         return super().write(values)
 
 

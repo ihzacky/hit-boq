@@ -15,7 +15,15 @@ class BoqWorkUnit(models.Model):
     work_unit_name = fields.Char(string='Nama Pekerjaan')
     updated_date = fields.Datetime(string="Updated Date") 
     updated_by = fields.Char(string="Updated By")
-    
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('waiting', 'Waiting for Confirmation'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], string="State", default='draft', readonly=True, tracking=True)
+    status = fields.Char(string="Status", compute="_compute_status", readonly=True, store=True)
+    revision_count = fields.Integer(string="Revision Count", compute="_compute_status", readonly=True, store=True)
+
     price_unit = fields.Monetary(string="Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True)
     
     material_ids = fields.One2many(
@@ -104,8 +112,47 @@ class BoqWorkUnit(models.Model):
             'target': 'main',
         }
 
+    def action_state_waiting(self):
+        self.ensure_one()
+        self.write({'state': 'waiting'})
+        return True 
 
+    def action_state_approved(self):
+        self.ensure_one()
+        self.write({'state': 'approved'})
+        return True
 
+    def action_state_rejected(self):
+        self.ensure_one()
+        self.write({'state': 'rejected'})
+        return True
 
+    def action_send_to_revision(self):
+        self.ensure_one()
+        self.write({'state': 'draft'})
+        return True
+
+    @api.depends('state', 'message_ids')
+    def _compute_status(self):
+        for record in self:
+            # Get all tracked changes for the state field
+            state_changes = record.message_ids.filtered(
+                lambda m: m.tracking_value_ids.filtered(
+                    lambda t: t.field_groups == 'state' and t.old_value_char in ['approved', 'rejected'] and t.new_value_char in ['draft']
+                )
+            )
+            revision_count = len(state_changes)
+            
+            base_status = {
+                'draft': 'Draft',
+                'waiting': 'Waiting for Confirmation',
+                'approved': 'Approved',
+                'rejected': 'Rejected'
+            }.get(record.state, '')
+
+            if revision_count > 0:
+                record.status = f"Revision-{revision_count} ({base_status})"
+            else:
+                record.status = base_status
 
 
