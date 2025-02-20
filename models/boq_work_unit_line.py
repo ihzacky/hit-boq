@@ -41,7 +41,8 @@ class BoqWorkUnitLine(models.Model):
     
     work_unit_id = fields.Many2one(
         comodel_name='boq.work_unit',
-        string='Satuan Pekerjaan'
+        string='Satuan Pekerjaan',
+        domain=[('state', '=', 'approved')]
     )
     
     boq_root_id = fields.Many2one(

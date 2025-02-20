@@ -1,0 +1,17 @@
+<odoo>
+    <record id="action_menu_material_products" model="ir.actions.act_window">
+        <field name="name">Material Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('type', '=', 'consu')]</field>
+        <field name="context">{'default_type': 'consu'}</field>
+    </record>
+
+    <record id="action_menu_service_products" model="ir.actions.act_window">
+        <field name="name">Service Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('type', '=', 'service')]</field>
+        <field name="context">{'default_type': 'service'}</field>
+    </record>
+</odoo> 

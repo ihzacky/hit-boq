@@ -10,6 +10,8 @@ class BoqWorkUnit(models.Model):
     _rec_name = 'work_unit_code'
     _order = 'sequence, id'
 
+    is_locked = fields.Boolean(string="Locked", default=False, compute="_compute_is_locked")
+
     sequence = fields.Integer(string="Sequence", default="1")
     work_unit_code = fields.Char(string='Kode Pekerjaan')
     work_unit_name = fields.Char(string='Nama Pekerjaan')
@@ -22,9 +24,9 @@ class BoqWorkUnit(models.Model):
         ('rejected', 'Rejected')
     ], string="State", default='draft', readonly=True, tracking=True)
     status = fields.Char(string="Status", compute="_compute_status", readonly=True, store=True)
-    revision_count = fields.Integer(string="Revision Count", compute="_compute_status", readonly=True, store=True)
+    revision_count = fields.Integer(string="Revision Count", default=0, readonly=True)
 
-    price_unit = fields.Monetary(string="Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True)
+    price_unit = fields.Monetary(string="Total Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True)
     
     material_ids = fields.One2many(
         comodel_name='boq.material', 
@@ -32,6 +34,7 @@ class BoqWorkUnit(models.Model):
         string='Satuan Pekerjaan - Material'
     )
     materials_price = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
+    materials_note = fields.Text(string="Material Note")
 
     service_ids = fields.One2many(
         comodel_name='boq.service', 
@@ -39,6 +42,7 @@ class BoqWorkUnit(models.Model):
         string='Satuan Pekerjaan - Jasa'
     )
     services_price = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
+    services_note = fields.Text(string="Services Note")
 
     others_ids = fields.One2many(
         comodel_name="boq.others", 
@@ -47,7 +51,7 @@ class BoqWorkUnit(models.Model):
     )
     others_price = fields.Monetary(string="Harga Lain-Lain", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
 
-    profit_percentage = fields.Integer(string="Profit Percentage", tracking=True, default=15)    
+    profit_percentage = fields.Float(string="Profit Percentage", tracking=True, compute="_compute_const")    
 
     currency_id = fields.Many2one(
         comodel_name="res.currency", 
@@ -61,6 +65,12 @@ class BoqWorkUnit(models.Model):
         inverse_name='work_unit_id',
         string='BOQ Work Unit Lines',
         tracking=True,
+    )
+
+    boq_const_id = fields.Many2one(
+        comodel_name="boq.const",
+        string="BoQ Const",
+        default=1
     )
     
     @api.depends('materials_price', 'services_price', 'others_price')
@@ -132,27 +142,49 @@ class BoqWorkUnit(models.Model):
         self.write({'state': 'draft'})
         return True
 
-    @api.depends('state', 'message_ids')
+    @api.depends('state', 'revision_count')
     def _compute_status(self):
         for record in self:
-            # Get all tracked changes for the state field
-            state_changes = record.message_ids.filtered(
-                lambda m: m.tracking_value_ids.filtered(
-                    lambda t: t.field_groups == 'state' and t.old_value_char in ['approved', 'rejected'] and t.new_value_char in ['draft']
-                )
-            )
-            revision_count = len(state_changes)
-            
             base_status = {
                 'draft': 'Draft',
                 'waiting': 'Waiting for Confirmation',
                 'approved': 'Approved',
                 'rejected': 'Rejected'
             }.get(record.state, '')
-
-            if revision_count > 0:
-                record.status = f"Revision-{revision_count} ({base_status})"
+            
+            if record.revision_count > 0:
+                record.status = f"Revision-{record.revision_count} ({base_status})"
             else:
                 record.status = base_status
 
+    def write(self, vals):
+        if 'state' in vals:
+            if vals['state'] == 'draft' and self.state in ['approved', 'rejected']:
+                vals['revision_count'] = self.revision_count + 1
+        return super().write(vals)
 
+    def action_revert_to_previous(self):
+        self.ensure_one()
+        self.write({'state': 'approved'})
+        return True
+
+    @api.depends('state')
+    def _compute_is_locked(self):
+        for record in self:
+            record.is_locked = record.state == 'approved'
+
+    def action_reset_to_zero(self):
+        self.ensure_one()
+        self.write({'state': 'draft'})
+        self.revision_count = 0
+        return True
+
+    @api.depends('boq_const_id')
+    def _compute_const(self):
+        for record in self:
+            if record.boq_const_id:
+                record.profit_percentage = record.boq_const_id.profit_percentage or 0.0
+                # record.material_margin = record.boq_const_id.material_margin or 0.0
+            else:
+                record.profit_percentage = 0.0
+                # record.material_margin = 0.0

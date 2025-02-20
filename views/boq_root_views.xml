@@ -33,6 +33,7 @@
                     </div>
                     <group>
                         <field name="boq_name"/>
+                        <field name="boq_const_id" invisible="1"/>
                         <field name="material_margin"/>
                         <field name="installation_margin"/>
                     </group>
@@ -40,10 +41,7 @@
                         <field name="work_unit_line_ids" widget="section_and_note_one2many" mode="tree" context="{'default_display_type': False}" nolabel="1" colspan="2">
                             <tree editable="bottom" string="Work Unit Line">                               
                                 <field name="sequence" widget="handle"/>
-                                <field name="display_type" invisible="1"/>
-                                <field name="work_unit_id" 
-                                       attrs="{'invisible': [('display_type', '!=', False)], 
-                                              'required': [('display_type', '=', False)]}"/>
+                                <field name="work_unit_id"/>
                                 <field name="work_unit_line_name" widget="section_and_note_text"/>
                                 <field name="work_unit_line_quantity" attrs="{'invisible': [('display_type', '!=', False)]}"/>
                                 <field name="work_unit_line_uom" attrs="{'invisible': [('display_type', '!=', False)]}"/>
@@ -55,11 +53,12 @@
                             </tree>
                         </field>
                         <field name="price_final" readonly="1" invisible="1"/>
+                        <field name="notes_work_unit" placeholder="Enter your work unit notes here..."/>
                     </group>
                     
                     <notebook>
-
                         <page name="pricing" string="Harga">
+
                             <group string="After Margin">
                                 <group string="Harga Satuan">
                                     <field name="work_unit_line_ids" nolabel="1" colspan="2">
@@ -81,7 +80,14 @@
                                         </tree>
                                     </field>
                                 </group>
+                                <group string="Total Harga">
+                                    <field name="material_price_final" string="Total Harga Material" widget="monetary"/>                                    
+                                    <field name="installation_price_final" string="Total Harga Instalasi" widget="monetary"/>                                    
+                                    <field name="maintenance_price_final" string="Total Harga Maintenance" widget="monetary"/>                                    
+                                    <field name="price_final" string="Total Seluruh Harga" widget="monetary"/>                                    
+                                </group>
                             </group>
+
                             <group string="Before Margin">
                                 <group string="Harga Satuan">
                                     <field name="work_unit_line_ids" nolabel="1" colspan="2">
@@ -103,23 +109,22 @@
                                         </tree>
                                     </field>
                                 </group>
+                                <group string="Total Harga">
+                                    <field name="material_price_total" widget="monetary"/>
+                                    <field name="installation_price_total" widget="monetary"/>
+                                    <field name="maintenance_price_total" widget="monetary"/>
+                                    <field name="price_total" widget="monetary"/>
+                                </group>
                             </group>
-                            <group string="Total Harga">
-                                <field name="material_price_total" widget="monetary"/>
-                                <field name="installation_price_total" widget="monetary"/>
-                                <field name="maintenance_price_total" widget="monetary"/>
-                                <field name="price_final" widget="monetary"/>
+                            <group>
+                                <group string="BoQ Notes">
+                                    <field name="notes_general" placeholder="Enter your BoQ notes here..." nolabel="1" colspan="2"/>
+                                </group>
                             </group>
-                        </page>
 
+                        </page>
                     </notebook>
-   
-                    <!-- <group name="name" string="Total Harga">
-                        <field name="material_price_total"/>
-                        <field name="installation_price_total"/>
-                        <field name="maintenance_price_total"/>
-                        <field name="price_final" />
-                    </group> -->
+
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>

@@ -31,7 +31,7 @@
         <menuitem
             id="menu_work_unit_material"
             name="Material"
-            action="action_menu_work_unit_material"
+            action="action_menu_material_products"
             parent="menu_work_unit"
             sequence="11"
         />
@@ -39,17 +39,25 @@
         <menuitem
             id="menu_work_unit_service"
             name="Jasa"
-            action="action_menu_work_unit_service"
+            action="action_menu_service_products"
             parent="menu_work_unit"
             sequence="12"
         />
         
-        <menuitem
+        <!-- <menuitem
             id="menu_work_unit_others"
             name="Lain-lain"    
             action="action_menu_work_unit_others"
             parent="menu_work_unit"
             sequence="13"
+        /> -->
+
+        <menuitem
+            id="menu_boq_const"
+            name="BoQ Const"
+            action="action_menu_boq_const"
+            parent="menu_boq"
         />
+        
     </data>
 </odoo>
