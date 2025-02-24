@@ -18,7 +18,10 @@ class BoqMaterial(models.Model):
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product",
-        domain=[('type', '=', 'consu')], 
+        domain=[
+            ('type', '=', 'consu'),
+            ('is_material', '=', 'True')
+        ], 
         tracking=True,
     )
     

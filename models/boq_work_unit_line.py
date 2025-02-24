@@ -21,6 +21,7 @@ class BoqWorkUnitLine(models.Model):
     work_unit_line_code = fields.Char(string='Kode Pekerjaan', compute='_get_work_unit_components', store=True)
     work_unit_line_name = fields.Char(string='Nama Pekerjaan', compute='_get_work_unit_components', store=True)
     work_unit_line_quantity = fields.Float(string='Quantity', default=1)
+    work_unit_line_notes = fields.Text(string="Work Unit Notes")
 
     """ Before Margin """
     material_base_price = fields.Monetary(string='Material Base Price', currency_field='currency_id', compute='_get_base_price', store=True)
@@ -49,6 +50,9 @@ class BoqWorkUnitLine(models.Model):
         comodel_name='boq.root',
         string='BoQ Root'
     )
+
+
+
 
     currency_id = fields.Many2one(
         comodel_name="res.currency", 

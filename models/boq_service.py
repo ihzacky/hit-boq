@@ -26,7 +26,10 @@ class BoqService(models.Model):
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product", 
-        domain=[('type', '=', 'service')],
+        domain=[
+            ('type', '=', 'service'),
+            ('is_service', '=', 'True')
+        ],
     )
 
     currency_id = fields.Many2one(

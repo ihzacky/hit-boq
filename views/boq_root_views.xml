@@ -38,18 +38,14 @@
                         <field name="installation_margin"/>
                     </group>
                     <group string="Pekerjaan">
-                        <field name="work_unit_line_ids" widget="section_and_note_one2many" mode="tree" context="{'default_display_type': False}" nolabel="1" colspan="2">
-                            <tree editable="bottom" string="Work Unit Line">                               
-                                <field name="sequence" widget="handle"/>
-                                <field name="work_unit_id"/>
-                                <field name="work_unit_line_name" widget="section_and_note_text"/>
-                                <field name="work_unit_line_quantity" attrs="{'invisible': [('display_type', '!=', False)]}"/>
-                                <field name="work_unit_line_uom" attrs="{'invisible': [('display_type', '!=', False)]}"/>
-                                <control>
-                                    <create string="Add a line" context="{'default_display_type': False}"/>
-                                    <create string="Add a section" context="{'default_display_type': 'line_section'}"/>
-                                    <create string="Add a note" context="{'default_display_type': 'line_note'}"/>
-                                </control>
+                        <field name="work_unit_line_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="work_unit_id" string="Kode Pekerjaan"/>
+                                <field name="work_unit_line_notes"/>
+                                <field name="work_unit_line_quantity"/>
+                                <field name="work_unit_line_uom"/>
+                                <field name="display_type" column_invisible="1"/>
                             </tree>
                         </field>
                         <field name="price_final" readonly="1" invisible="1"/>
@@ -61,8 +57,9 @@
 
                             <group string="After Margin">
                                 <group string="Harga Satuan">
-                                    <field name="work_unit_line_ids" nolabel="1" colspan="2">
-                                        <tree edit="false" create="false" delete="false">
+                                    <field name="work_unit_line_after_margin_ids" nolabel="1" colspan="2">
+                                        <tree editable="bottom">
+                                            <field name="sequence" widget="handle" invisible="1"/>
                                             <field name="work_unit_line_code"/>
                                             <field name="material_base_price_after_margin" string="Material"/>
                                             <field name="service_base_price_after_margin" string="Instalasi"/>
@@ -71,8 +68,9 @@
                                     </field>
                                 </group>
                                 <group string="Harga">
-                                    <field name="work_unit_line_ids" nolabel="1" colspan="2">
-                                        <tree edit="false" create="false" delete="false">
+                                    <field name="work_unit_line_after_margin_ids" nolabel="1" colspan="2">
+                                        <tree editable="bottom">
+                                            <field name="sequence" widget="handle" invisible="1"/>
                                             <field name="work_unit_line_code"/>
                                             <field name="material_price_after_margin_final" string="Material"/>
                                             <field name="service_price_after_margin_final" string="Instalasi"/>
@@ -90,8 +88,9 @@
 
                             <group string="Before Margin">
                                 <group string="Harga Satuan">
-                                    <field name="work_unit_line_ids" nolabel="1" colspan="2">
-                                        <tree edit="false" create="false" delete="false">
+                                    <field name="work_unit_line_before_margin_ids" nolabel="1" colspan="2" >
+                                        <tree editable="bottom">
+                                            <field name="sequence" widget="handle" invisible="1"/>
                                             <field name="work_unit_line_code"/>
                                             <field name="material_base_price" string="Material"/>
                                             <field name="service_base_price" string="Instalasi"/>
@@ -100,8 +99,9 @@
                                     </field>
                                 </group>
                                 <group string="Harga">
-                                    <field name="work_unit_line_ids" nolabel="1" colspan="2">
-                                        <tree edit="false" create="false" delete="false">
+                                    <field name="work_unit_line_before_margin_ids" nolabel="1" colspan="2">
+                                        <tree editable="bottom">
+                                            <field name="sequence" widget="handle" invisible="1"/>
                                             <field name="work_unit_line_code"/>
                                             <field name="material_price_final" string="Material"/>
                                             <field name="service_price_final" string="Instalasi"/>

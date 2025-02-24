@@ -40,6 +40,20 @@ class BoqRoot(models.Model):
         tracking=True,
     )
 
+    work_unit_line_before_margin_ids = fields.One2many(
+        comodel_name='boq.work_unit.line',
+        related='work_unit_line_ids',
+        string='Work Unit Lines Before Margin',
+        readonly=True
+    )
+
+    work_unit_line_after_margin_ids = fields.One2many(
+        comodel_name='boq.work_unit.line',
+        related='work_unit_line_ids',
+        string='Work Unit Lines After Margin',
+        readonly=True
+    )
+
     currency_id = fields.Many2one(
         comodel_name="res.currency", 
         string="Currency", 

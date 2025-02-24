@@ -13,7 +13,7 @@
         <field name="arch" type="xml">
             
             <tree string="boq const tree">
-                <field name="id" />
+                <!-- <field name="id" /> -->
                 <field name="profit_percentage"/>
                 <field name="material_margin"/>
                 <field name="installation_margin" />
