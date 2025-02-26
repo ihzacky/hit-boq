@@ -67,6 +67,42 @@ class BoqRoot(models.Model):
         default=1
     )
 
+    def _calculate_material_prices(self, lines):
+        # calculate material prices before and after margin
+        total = sum(line.material_price_final or 0.0 for line in lines)
+        final = sum(line.material_price_after_margin_final or 0.0 for line in lines)
+        return total, final
+
+    def _calculate_service_prices(self, lines):
+        # calculate installation and maintenance prices
+        installation_total = installation_final = 0.0
+        maintenance_total = maintenance_final = 0.0
+
+        for line in lines:
+            if line.work_unit_line_code.startswith('MNT'):
+                maintenance_total += line.service_price_final or 0.0
+                maintenance_final += line.service_price_after_margin_final or 0.0
+            else:
+                installation_total += line.service_price_final or 0.0
+                installation_final += line.service_price_after_margin_final or 0.0
+
+        return (installation_total, installation_final, maintenance_total, maintenance_final)
+
+    def _update_price_fields(self, material_prices, service_prices):
+        # update all price fields
+        material_total, material_final = material_prices
+        (installation_total, installation_final, maintenance_total, maintenance_final) = service_prices
+
+        self.material_price_total = material_total
+        self.installation_price_total = installation_total
+        self.maintenance_price_total = maintenance_total
+        self.price_total = material_total + installation_total + maintenance_total
+
+        self.material_price_final = material_final
+        self.installation_price_final = installation_final
+        self.maintenance_price_final = maintenance_final
+        self.price_final = material_final + installation_final + maintenance_final
+
     @api.depends(
         'work_unit_line_ids', 
         'work_unit_line_ids.material_price_final', 
@@ -78,35 +114,10 @@ class BoqRoot(models.Model):
     )
     def _compute_boq_price(self):
         for record in self:
-            material_total = 0.0
-            installation_total = 0.0
-            maintenance_total = 0.0
-
-            material_final = 0.0
-            installation_final = 0.0
-            maintenance_final = 0.0
-            
-            for line in record.work_unit_line_ids:
-                material_total += line.material_price_final or 0.0
-                material_final += line.material_price_after_margin_final or 0.0
-
-                if line.work_unit_line_code.startswith('MNT'):
-                    maintenance_total += line.service_price_final or 0.0
-                    maintenance_final += line.service_price_after_margin_final or 0.0
-
-                else:
-                    installation_total += line.service_price_final or 0.0
-                    installation_final += line.service_price_after_margin_final or 0.0
-                    
-            record.material_price_total = material_total
-            record.installation_price_total = installation_total
-            record.maintenance_price_total = maintenance_total
-            record.price_total = material_total + installation_total + maintenance_total
-
-            record.material_price_final = material_final
-            record.installation_price_final = installation_final
-            record.maintenance_price_final = maintenance_final
-            record.price_final = material_final + installation_final + maintenance_final
+            lines = record.work_unit_line_ids
+            material_prices = record._calculate_material_prices(lines)
+            service_prices = record._calculate_service_prices(lines)
+            record._update_price_fields(material_prices, service_prices)
 
     @api.depends('boq_const_id')
     def _compute_const(self):
