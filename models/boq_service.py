@@ -5,6 +5,7 @@ class BoqService(models.Model):
     _name = 'boq.service'
     _description = 'BoQ Satuan Pekerjaan - Jasa'
     _order = "sequence, id"
+    _inherit = "mail.thread"
     # _rec_name = 'boq_jasa'
 
     service_name = fields.Char(string='Nama Jasa', tracking=True, compute="_get_attributes_from_product")

@@ -8,20 +8,21 @@ class BoqRoot(models.Model):
 
     boq_code = fields.Char(string='Kode BoQ')
     boq_name = fields.Char(string='Nama')
-    material_margin = fields.Float(string='Material Margin', compute="_compute_const")
-    installation_margin = fields.Float(string='Installation Margin', compute="_compute_const")
+    
+    material_margin = fields.Float(string='Material Margin', compute="_compute_const", store=True)
+    installation_margin = fields.Float(string='Installation Margin', compute="_compute_const", store=True)
     updated_date = fields.Datetime(string="Updated Date") 
     updated_by = fields.Char(string="Updated By")
 
-    material_price_total = fields.Monetary(string='Total Harga Material', currency_field='currency_id', compute="_compute_boq_price", tracking=True)
-    installation_price_total = fields.Monetary(string='Total Harga Instalasi', currency_field='currency_id', compute="_compute_boq_price", tracking=True)
-    maintenance_price_total = fields.Monetary(string='Total Harga Maintenance', currency_field='currency_id', compute="_compute_boq_price")
-    price_total = fields.Monetary(string='Total Seluruh Harga', currency_field='currency_id', compute="_compute_boq_price", tracking=True)
+    material_price_total = fields.Monetary(string='Total Harga Material', currency_field='currency_id', compute="_compute_boq_price", tracking=True, store=True)
+    installation_price_total = fields.Monetary(string='Total Harga Instalasi', currency_field='currency_id', compute="_compute_boq_price", tracking=True, store=True)
+    maintenance_price_total = fields.Monetary(string='Total Harga Maintenance', currency_field='currency_id', compute="_compute_boq_price", tracking=True, store=True)
+    price_total = fields.Monetary(string='Total Seluruh Harga', currency_field='currency_id', compute="_compute_boq_price", tracking=True, store=True)
 
-    material_price_final = fields.Monetary(string="Total Harga Material sesudah margin", currency_field="currency_id", compute="_compute_boq_price")
-    installation_price_final = fields.Monetary(string="Total Harga Instalasi sesudah margin", currency_field="currency_id", compute="_compute_boq_price")
-    maintenance_price_final = fields.Monetary(string="Total Harga Maintenance sesudah margin", currency_field="currency_id", compute="_compute_boq_price")
-    price_final = fields.Monetary(string="Total Seluruh Harga sesudah margin", currency_field="currency_id", compute="_compute_boq_price")
+    material_price_final = fields.Monetary(string="Total Harga Material sesudah margin", currency_field="currency_id", compute="_compute_boq_price", store=True)
+    installation_price_final = fields.Monetary(string="Total Harga Instalasi sesudah margin", currency_field="currency_id", compute="_compute_boq_price", store=True)
+    maintenance_price_final = fields.Monetary(string="Total Harga Maintenance sesudah margin", currency_field="currency_id", compute="_compute_boq_price", store=True)
+    price_final = fields.Monetary(string="Total Seluruh Harga sesudah margin", currency_field="currency_id", compute="_compute_boq_price", store=True)
 
 
     notes_work_unit = fields.Html(string="Work Unit Notes")
@@ -38,6 +39,8 @@ class BoqRoot(models.Model):
         inverse_name='boq_root_id',
         string='Work Unit Lines',
         tracking=True,
+        domain=[('is_duplicate', '=', 'false')]
+        
     )
 
     work_unit_line_before_margin_ids = fields.One2many(
@@ -88,21 +91,6 @@ class BoqRoot(models.Model):
 
         return (installation_total, installation_final, maintenance_total, maintenance_final)
 
-    def _update_price_fields(self, material_prices, service_prices):
-        # update all price fields
-        material_total, material_final = material_prices
-        (installation_total, installation_final, maintenance_total, maintenance_final) = service_prices
-
-        self.material_price_total = material_total
-        self.installation_price_total = installation_total
-        self.maintenance_price_total = maintenance_total
-        self.price_total = material_total + installation_total + maintenance_total
-
-        self.material_price_final = material_final
-        self.installation_price_final = installation_final
-        self.maintenance_price_final = maintenance_final
-        self.price_final = material_final + installation_final + maintenance_final
-
     @api.depends(
         'work_unit_line_ids', 
         'work_unit_line_ids.material_price_final', 
@@ -119,9 +107,42 @@ class BoqRoot(models.Model):
             service_prices = record._calculate_service_prices(lines)
             record._update_price_fields(material_prices, service_prices)
 
+
+    def _update_price_fields(self, material_prices, service_prices):
+        # update all price fields
+        material_total, material_final = material_prices
+        (installation_total, installation_final, maintenance_total, maintenance_final) = service_prices
+
+        self.material_price_total = material_total
+        self.installation_price_total = installation_total
+        self.maintenance_price_total = maintenance_total
+        self.price_total = material_total + installation_total + maintenance_total
+
+        self.material_price_final = material_final
+        self.installation_price_final = installation_final
+        self.maintenance_price_final = maintenance_final
+        self.price_final = material_final + installation_final + maintenance_final
+
     @api.depends('boq_const_id')
     def _compute_const(self):
         for record in self:
-            record.material_margin = record.boq_const_id.material_margin or 0.0
-            record.installation_margin = record.boq_const_id.installation_margin or 0.0
+            if record.boq_const_id:
+                record.material_margin = record.boq_const_id.material_margin
+                record.installation_margin = record.boq_const_id.installation_margin
+            else:
+                record.material_margin, record.installation_margin = 0.0
 
+    '''TO DO: Automate-kan function ini'''
+    def recompute_all(self):
+        for record in self:
+            lines = record.work_unit_line_ids
+            
+            record._compute_const()
+            material_prices = record._calculate_material_prices(lines)
+            service_prices = record._calculate_service_prices(lines)
+            record._update_price_fields(material_prices, service_prices)
+        
+            # force recompute on work unit lines
+            record.work_unit_line_ids.mapped('material_price_final')
+            record.work_unit_line_ids.mapped('service_price_final')
+            
