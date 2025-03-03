@@ -14,16 +14,4 @@
         <field name="domain">[('is_service', '=', 'True')]</field>
         <field name="context">{'default_is_service': 'True', 'default_type': 'service'}</field>
     </record>
-
-    <!-- Inherit Product Tree View -->
-    <record id="view_product_product_tree_inherit" model="ir.ui.view">
-        <field name="name">product.product.tree.inherit</field>
-        <field name="model">product.product</field>
-        <field name="inherit_id" ref="product.product_product_tree_view"/>
-        <field name="arch" type="xml">
-            <field name="uom_id" position="after">
-                <field name="product_tag_ids" widget="many2many_tags"/>
-            </field>
-        </field>
-    </record>
 </odoo>

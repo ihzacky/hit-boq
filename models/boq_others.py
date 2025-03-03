@@ -6,8 +6,8 @@ class BoqOthers(models.Model):
     _rec_name = 'others_name'
 
     others_name = fields.Char(string="Nama Lain-Lain")
-    others_base_price = fields.Monetary(string="Harga/Unit", currency_fields="currency_id", compute="_compute_others_base_price")
-    others_price_final = fields.Monetary(string="Harga", currency_fields="currency_id", compute="_compute_others_price_final")
+    others_base_price = fields.Monetary(string="Harga/Unit", currency_field='currency_id', compute="_compute_others_base_price")
+    others_price_final = fields.Monetary(string="Harga", currency_field='currency_id', compute="_compute_others_price_final")
     others_quantity = fields.Float(string="Quantity", default=0)
     others_uom = fields.Char(string="Unit", default="%", readonly=True)
 
