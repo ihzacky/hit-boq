@@ -4,6 +4,7 @@
         <field name="name">Satuan Pekerjaan</field>
         <field name="res_model">boq.work_unit</field>
         <field name="view_mode">tree,form</field>
+
     </record>
 
     <!-- tree -->
@@ -11,12 +12,12 @@
         <field name="name">menu.work_unit.tree</field>
         <field name="model">boq.work_unit</field>
         <field name="arch" type="xml">
-            
             <tree string="Work Unit Tree">
                 <field name="work_unit_code"/>
                 <field name="work_unit_name"/>
                 <field name="price_unit" />
                 <field name="state"/>
+                <field name="is_duplicate" invisible="0"/>
             </tree>
         </field>
     </record>
@@ -29,7 +30,7 @@
             <form string="BoQ Form">
                 <header>
                     <button string="Save" type="object" name="action_save" class="btn-primary"/>
-                    <button string="Refresh Prices" type="object" name="action_refresh" class="btn-outline-warning"/>
+                    <!-- <button string="Refresh Prices" type="object" name="action_refresh" class="btn-outline-warning"/> -->
 
                     <!-- Buttons for 'Draft' State -->
                     <button name="action_state_waiting" string="Submit for Approval" type="object"
@@ -65,7 +66,7 @@
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group>
-                            <field name="is_duplicate" readonly="0" invisible="0"/>
+                            <field name="is_duplicate" readonly="1" invisible="1"/>
                             <field name="status" readonly="1"/>
                             <field name="is_locked" readonly="1" invisible="1"/>
                             <field name="revision_count" readonly="1" invisible="1"/>

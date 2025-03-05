@@ -26,7 +26,11 @@
         <field name="arch" type="xml">
             <form string="BoQ Form">
                 <header>
-                    <button string="Refresh Price" name="recompute_all" type="object" class="btn-outline-warning"/>
+                    <!-- <button string="Refresh Price" name="recompute_all" type="object" class="btn-outline-warning"/> -->
+                    <button string="Print Report" 
+                            type="object" 
+                            class="btn-primary" 
+                            name="action_print_report"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -35,10 +39,16 @@
                         </h1>
                     </div>
                     <group>
-                        <field name="boq_name"/>
-                        <field name="boq_const_id" invisible="1"/>
-                        <field name="material_margin"/>
-                        <field name="installation_margin"/>
+                        <group>
+                            <field name="boq_name"/>
+                            <field name="boq_const_id" invisible="1"/>
+                            <field name="updated_date" readonly="1"/>
+                            <field name="updated_by" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="material_margin"/>
+                            <field name="installation_margin"/>
+                        </group>
                     </group>
                     <group string="Pekerjaan">
                         <field name="work_unit_line_ids" nolabel="1" colspan="2">

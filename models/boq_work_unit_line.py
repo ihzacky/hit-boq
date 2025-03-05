@@ -37,7 +37,7 @@ class BoqWorkUnitLine(models.Model):
         string='Satuan Pekerjaan',
         domain=[
             ('state', '=', 'approved'),
-            ('is_duplicate', '=', 'false')
+            ('is_duplicate', '=', False)
         ]
     )
     

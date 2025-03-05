@@ -15,6 +15,7 @@
         "views/work_unit_material_views.xml",
         "views/work_unit_service_views.xml",
         "views/work_unit_others_views.xml",
+        "report/boq_root_report.xml",
         "views/menu_boq_views.xml",
     ],
     "license": "AGPL-3",

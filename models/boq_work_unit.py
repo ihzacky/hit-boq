@@ -85,13 +85,21 @@ class BoqWorkUnit(models.Model):
             # calculate total price
             line.price_unit = materials_price + services_price + others_price
     
-    @api.depends('material_ids', 'service_ids', 'others_ids')
+    @api.depends('material_ids.product_id', 'service_ids.product_id', 'others_ids.product_id',
+                 'material_ids.material_price', 'service_ids.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
-        for line in self:
-            _logger.info(f"Currency: {self.currency_id}")
-            line.materials_price = sum(line.material_ids.mapped('material_price')) if line.material_ids else 0.0
-            line.services_price = sum(line.service_ids.mapped('service_price')) if line.service_ids else 0.0
-            line.others_price = sum(line.others_ids.mapped('others_price_final')) if line.others_ids else 0.0
+        for record in self:
+            # Calculate materials price
+            record.materials_price = sum(line.material_price for line in record.material_ids)
+            
+            # Calculate services price
+            record.services_price = sum(line.service_price for line in record.service_ids)
+            
+            # Calculate others price
+            record.others_price = sum(line.others_price_final for line in record.others_ids)
+            
+            # Remove the problematic logging statement
+            # _logger.info(f"Currency: {self.currency_id}")  # This was causing recursion
     
     # automatically create others data when work_unit_code is set
     @api.onchange('work_unit_code')
@@ -102,14 +110,14 @@ class BoqWorkUnit(models.Model):
                 Command.create({'others_name': 'Lain-lain'}),
             ]
 
-    def action_refresh(self):
-        self.ensure_one()
-        self.material_ids.recompute_material_price()
-        self.service_ids.recompute_service_price
-        self.others_ids.recompute_others_price()
-        self._compute_component_prices() 
-        self._compute_price_unit()
-        return True 
+    # def action_refresh(self):
+    #     self.ensure_one()
+    #     self.material_ids.recompute_material_price()
+    #     self.service_ids.recompute_service_price
+    #     self.others_ids.recompute_others_price()
+    #     self._compute_component_prices() 
+    #     self._compute_price_unit()
+    #     return True 
 
     def action_save(self):
         self.ensure_one()
@@ -178,8 +186,8 @@ class BoqWorkUnit(models.Model):
                 vals['revision_count'] = self.revision_count + 1
                 
         # create duplicate when record is approved
-        if vals.get('state') == 'approved':
-            self.action_duplicate_on_approval()
+        if vals.get('state') == 'approved' and not self.env.context.get('skipping_duplicate'):
+            self.with_context(skipping_duplicate=True).action_duplicate_on_approval()
                 
         return super().write(vals)
 
@@ -187,7 +195,6 @@ class BoqWorkUnit(models.Model):
     @api.depends('material_ids', 'service_ids', 'others_ids')
     def action_duplicate_on_approval(self):
         for record in self:
-            # Search for an existing duplicate record
             existing_duplicate = self.search([
                 ('work_unit_code', '=', record.work_unit_code),
                 ('is_duplicate', '=', True),
@@ -195,47 +202,23 @@ class BoqWorkUnit(models.Model):
             ], limit=1)
             
             if existing_duplicate:
-                existing_duplicate.material_ids.unlink()
-                existing_duplicate.service_ids.unlink()
-                existing_duplicate.others_ids.unlink()
-                
-                for material in record.material_ids:
-                    material.copy({'work_unit_id': existing_duplicate.id})
-                
-                for service in record.service_ids:
-                    service.copy({'work_unit_id': existing_duplicate.id})
-                
-                for other in record.others_ids:
-                    other.copy({'work_unit_id': existing_duplicate.id})
-                
-                record.status = existing_duplicate.status
-                record.state = existing_duplicate.state
-                record.updated_by = existing_duplicate.updated_by
-                record.updated_date = existing_duplicate.updated_date
-                
-            else:
-                default = {
-                    'is_duplicate': True,
-                    'material_ids': False,
-                    'service_ids': False,
-                    'others_ids': False,
-                    
+                existing_duplicate.with_context(skipping_duplicate=True).write({
+                    'material_ids': [(5, 0, 0)] + [(6, 0, record.material_ids.ids)],
+                    'service_ids': [(5, 0, 0)] + [(6, 0, record.service_ids.ids)],
+                    'others_ids': [(5, 0, 0)] + [(6, 0, record.others_ids.ids)],
                     'status': record.status,
                     'state': 'approved',
                     'updated_by': record.updated_by,
-                    'updated_date': record.updated_date,
-                }
-                duplicated_record = record.copy(default)
-                
-                # Now manually create copies of each related record
-                for material in record.material_ids:
-                    material.copy({'work_unit_id': duplicated_record.id})
-                    
-                for service in record.service_ids:
-                    service.copy({'work_unit_id': duplicated_record.id})
-                    
-                for other in record.others_ids:
-                    other.copy({'work_unit_id': duplicated_record.id})
+                    'updated_date': record.updated_date
+                })
+            else:
+                duplicated_record = record.copy({
+                    'is_duplicate': True,
+                    'state': 'approved',
+                    'material_ids': [(6, 0, record.material_ids.ids)],
+                    'service_ids': [(6, 0, record.service_ids.ids)],
+                    'others_ids': [(6, 0, record.others_ids.ids)]
+                })
 
     def action_revert_to_previous(self):
         # reverts the current data to its previous approved version by copying/overwite all values
