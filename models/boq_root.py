@@ -9,6 +9,9 @@ class BoqRoot(models.Model):
     boq_code = fields.Char(string='Kode BoQ')
     boq_name = fields.Char(string='Nama')
     
+    updated_date = fields.Datetime(string="Updated Date") 
+    updated_by = fields.Char(string="Updated By")
+    
     material_margin = fields.Float(string='Material Margin', compute="_compute_const", store=True)
     installation_margin = fields.Float(string='Installation Margin', compute="_compute_const", store=True)
     updated_date = fields.Datetime(string="Updated Date") 
@@ -39,7 +42,7 @@ class BoqRoot(models.Model):
         inverse_name='boq_root_id',
         string='Work Unit Lines',
         tracking=True,
-        domain=[('is_duplicate', '=', 'false')]
+        domain=[('is_duplicate', '=', False)]
         
     )
 
@@ -69,6 +72,13 @@ class BoqRoot(models.Model):
         string="BoQ Const",
         default=1
     )
+    
+    def write(self, vals):
+        vals.update({
+            'updated_date': fields.Datetime.now(),
+            'updated_by': self.env.user.name,
+        })
+        return super(BoqRoot, self).write(vals)
 
     def _calculate_material_prices(self, lines):
         # calculate material prices before and after margin
@@ -146,3 +156,6 @@ class BoqRoot(models.Model):
             record.work_unit_line_ids.mapped('material_price_final')
             record.work_unit_line_ids.mapped('service_price_final')
             
+
+    def action_print_report(self):
+        return self.env.ref('hit_boq.action_report_boq').report_action(self)
