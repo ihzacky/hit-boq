@@ -195,9 +195,16 @@
                     </div>
                 </div> -->
 
+                <div class="row mt-4" t-if="doc.notes_exclude">
+                    <div class="col-12">
+                        <strong>Exclude:</strong>
+                        <p><span t-field="doc.notes_exclude"/></p>
+                    </div>
+                </div>
+
                 <div class="row mt-4">
                     <div class="col-12">
-                        <p><strong>Note:</strong></p>
+                        <strong>Note:</strong>
                         <p><span t-field="doc.notes_general"/></p>
                         <!-- <ul style="list-style-type: none; padding-left: 20px;">
                             <li>Transportasi &amp; Akomodasi Teknisi Selama Instalasi/MNTenance ditanggung</li>
@@ -216,6 +223,7 @@
                         </ul> -->
                     </div>
                 </div>  
+                
 
                 <!-- Notes from BoQ Root -->
                 <!-- <div class="row mt-4" t-if="doc.notes_general">
@@ -231,6 +239,7 @@
                         <div t-field="doc.notes_work_unit"/>
                     </div>
                 </div>
+                
             </div>
         </t>
     </template>

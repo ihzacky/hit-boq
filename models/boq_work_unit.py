@@ -12,7 +12,7 @@ class BoqWorkUnit(models.Model):
     _order = 'sequence, id'
 
     is_locked = fields.Boolean(string="Locked", default=False, compute="_compute_is_locked")
-    is_duplicate = fields.Boolean(default=False)
+    is_duplicate = fields.Boolean(default=False, store=True)
 
     sequence = fields.Integer(string="Sequence", default="1")
     work_unit_code = fields.Char(string='Kode Pekerjaan')
@@ -89,18 +89,10 @@ class BoqWorkUnit(models.Model):
                  'material_ids.material_price', 'service_ids.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
         for record in self:
-            # Calculate materials price
             record.materials_price = sum(line.material_price for line in record.material_ids)
-            
-            # Calculate services price
             record.services_price = sum(line.service_price for line in record.service_ids)
-            
-            # Calculate others price
             record.others_price = sum(line.others_price_final for line in record.others_ids)
             
-            # Remove the problematic logging statement
-            # _logger.info(f"Currency: {self.currency_id}")  # This was causing recursion
-    
     # automatically create others data when work_unit_code is set
     @api.onchange('work_unit_code')
     def _onchange_work_unit_code(self):
@@ -136,22 +128,18 @@ class BoqWorkUnit(models.Model):
     def action_state_waiting(self):
         self.ensure_one()
         self.write({'state': 'waiting'})
-        return True 
 
     def action_state_approved(self):
         self.ensure_one()
         self.write({'state': 'approved'})
-        return True
 
     def action_state_rejected(self):
         self.ensure_one()
         self.write({'state': 'rejected'})
-        return True
 
     def action_send_to_revision(self):
         self.ensure_one()
         self.write({'state': 'draft'})
-        return True
 
     @api.depends('state', 'revision_count')
     def _compute_status(self):
@@ -202,23 +190,61 @@ class BoqWorkUnit(models.Model):
             ], limit=1)
             
             if existing_duplicate:
+                # Clear existing records in duplicate
+                existing_duplicate.material_ids.unlink()
+                existing_duplicate.service_ids.unlink()
+                existing_duplicate.others_ids.unlink()
+                
+                # Create new copies for materials
+                for material in record.material_ids:
+                    material.copy({
+                        'work_unit_id': existing_duplicate.id
+                    })
+                
+                # Create new copies for services
+                for service in record.service_ids:
+                    service.copy({
+                        'work_unit_id': existing_duplicate.id
+                    })
+                
+                # Create new copies for others
+                for other in record.others_ids:
+                    other.copy({
+                        'work_unit_id': existing_duplicate.id
+                    })
+                
+                # Update other fields
                 existing_duplicate.with_context(skipping_duplicate=True).write({
-                    'material_ids': [(5, 0, 0)] + [(6, 0, record.material_ids.ids)],
-                    'service_ids': [(5, 0, 0)] + [(6, 0, record.service_ids.ids)],
-                    'others_ids': [(5, 0, 0)] + [(6, 0, record.others_ids.ids)],
                     'status': record.status,
                     'state': 'approved',
                     'updated_by': record.updated_by,
                     'updated_date': record.updated_date
                 })
+            
             else:
+                # Create new duplicate record
                 duplicated_record = record.copy({
                     'is_duplicate': True,
-                    'state': 'approved',
-                    'material_ids': [(6, 0, record.material_ids.ids)],
-                    'service_ids': [(6, 0, record.service_ids.ids)],
-                    'others_ids': [(6, 0, record.others_ids.ids)]
+                    'state': 'approved'
                 })
+                
+                # Copy materials
+                for material in record.material_ids:
+                    material.copy({
+                        'work_unit_id': duplicated_record.id
+                    })
+                
+                # Copy services
+                for service in record.service_ids:
+                    service.copy({
+                        'work_unit_id': duplicated_record.id
+                    })
+                
+                # Copy others
+                for other in record.others_ids:
+                    other.copy({
+                        'work_unit_id': duplicated_record.id
+                    })
 
     def action_revert_to_previous(self):
         # reverts the current data to its previous approved version by copying/overwite all values
@@ -279,5 +305,24 @@ class BoqWorkUnit(models.Model):
                 # })
                 
                 return True
+
+    def unlink(self):
+        for record in self:
+            if not record.is_duplicate:
+                # Find and delete the duplicate record
+                duplicate = self.search([
+                    ('work_unit_code', '=', record.work_unit_code),
+                    ('is_duplicate', '=', True)
+                ])
+                if duplicate:
+                    duplicate.with_context(skip_unlink_check=True).unlink()
+            elif self.env.context.get('skip_unlink_check'):
+                # Allow deletion of duplicate when called from parent deletion
+                return super().unlink()
+            else:
+                # Prevent direct deletion of duplicates
+                raise models.ValidationError('Cannot delete duplicate records directly. Delete the original record instead.')
+                
+        return super().unlink()
 
 

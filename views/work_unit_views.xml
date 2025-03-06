@@ -4,7 +4,6 @@
         <field name="name">Satuan Pekerjaan</field>
         <field name="res_model">boq.work_unit</field>
         <field name="view_mode">tree,form</field>
-
     </record>
 
     <!-- tree -->

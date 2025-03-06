@@ -31,6 +31,7 @@ class BoqRoot(models.Model):
 
     notes_work_unit = fields.Html(string="Work Unit Notes")
     notes_general = fields.Html(string="BoQ Notes")
+    notes_exclude = fields.Html(string="Exclude Notes")
 
     state = fields.Selection([
         ('draft', 'Draft'),

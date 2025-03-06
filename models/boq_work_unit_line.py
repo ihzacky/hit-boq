@@ -68,7 +68,7 @@ class BoqWorkUnitLine(models.Model):
     )
     
     # before margin
-    @api.depends('work_unit_id')
+    @api.depends('work_unit_id', 'work_unit_id.materials_price', 'work_unit_id.services_price', 'work_unit_id.others_price')
     def _get_base_price(self):
         for record in self:
             record.material_base_price = record.work_unit_id.materials_price
@@ -83,7 +83,11 @@ class BoqWorkUnitLine(models.Model):
             record.others_price_final = record.others_base_price * record.work_unit_line_quantity
 
     # after margin
-    @api.depends('material_base_price', 'service_base_price', 'boq_root_id.material_margin', 'boq_root_id.installation_margin')
+    @api.depends(
+        'material_base_price', 'service_base_price', 
+        'boq_root_id.material_margin', 'boq_root_id.installation_margin',
+        'work_unit_id.materials_price', 'work_unit_id.services_price'
+    )
     def _compute_components_price_after_margin(self):
         for record in self:
             record.material_base_price_after_margin = 0.0

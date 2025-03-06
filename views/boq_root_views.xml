@@ -133,6 +133,9 @@
                                 <group string="BoQ Notes">
                                     <field name="notes_general" placeholder="Enter your BoQ notes here..." nolabel="1" colspan="2"/>
                                 </group>
+                                <group string="Exclude Notes">
+                                    <field name="notes_exclude" placeholder="Enter your Exclude notes here..." nolabel="1" colspan="2"/>
+                                </group>
                             </group>
 
                         </page>
