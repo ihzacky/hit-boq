@@ -8,6 +8,7 @@
     "category": "Customizations",
     "depends": ["base", "product", "mail"],
     "data": [
+        "views/boq_report_preview_views.xml",
         "views/boq_const_views.xml",
         "views/product_views.xml",
         "views/boq_root_views.xml",

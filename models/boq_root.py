@@ -144,20 +144,26 @@ class BoqRoot(models.Model):
             else:
                 record.material_margin, record.installation_margin = 0.0
 
-    # '''TO DO: Automate-kan function ini'''
-    # def recompute_all(self):
-    #     for record in self:
-    #         lines = record.work_unit_line_ids
-            
-    #         record._compute_const()
-    #         material_prices = record._calculate_material_prices(lines)
-    #         service_prices = record._calculate_service_prices(lines)
-    #         record._update_price_fields(material_prices, service_prices)
-        
-    #         # force recompute on work unit lines
-    #         record.work_unit_line_ids.mapped('material_price_final')
-    #         record.work_unit_line_ids.mapped('service_price_final')
-            
+    def _compute_preview_html(self):
+        for record in self:
+            record.preview_html = self.env['ir.qweb']._render(
+                'hit_boq.report_boq', {'docs': record}
+            )
+
+    preview_html = fields.Html(compute="_compute_preview_html", sanitize=False)
+
+    def preview_pdf(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'current',
+            'views': [(self.env.ref('hit_boq.view_boq_root_preview_form').id, 'form')],
+            'context': {
+                'default_print_preview': True,
+            }
+        }
 
     def action_print_report(self):
         return self.env.ref('hit_boq.action_report_boq').report_action(self)
