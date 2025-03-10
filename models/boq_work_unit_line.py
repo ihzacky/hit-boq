@@ -8,10 +8,11 @@ class BoqWorkUnitLine(models.Model):
     _description = 'BoQ Work Unit Line'
     _order = 'sequence, id'
 
+    
     sequence = fields.Integer(string="Sequence", default=1)
-    is_duplicate = fields.Boolean(compute='_get_duplicate_status')
+    is_duplicate = fields.Boolean(compute='_get_duplicate_status', store=True)
     work_unit_line_code = fields.Char(string='Kode Pekerjaan', compute='_get_work_unit_components', store=True)
-    work_unit_line_name = fields.Char(string='Nama Pekerjaan', compute='_get_work_unit_components', store=True)
+    name = fields.Char(string='Nama Pekerjaan', compute='_get_work_unit_components', store=True, readonly=False, required=True)
     work_unit_line_quantity = fields.Float(string='Quantity', default=1)
     work_unit_line_notes = fields.Text(string="Work Unit Notes")
 
@@ -67,6 +68,17 @@ class BoqWorkUnitLine(models.Model):
         ], default=False
     )
     
+    @api.model
+    def create(self, vals_list):
+        # if vals_list.get('display_type'):
+        #     vals_list.update(work_unit_id=False, work_unit_line_quantity=0)
+       
+        for vals in vals_list:
+            if vals.get('display_type') or self.default_get(['display_type']).get('display_type'):
+                vals['work_unit_line_quantity'] = 0.0
+       
+        return super().create(vals_list)
+    
     # before margin
     @api.depends('work_unit_id', 'work_unit_id.materials_price', 'work_unit_id.services_price', 'work_unit_id.others_price')
     def _get_base_price(self):
@@ -120,9 +132,9 @@ class BoqWorkUnitLine(models.Model):
     def _get_work_unit_components(self):
         for record in self:
             record.work_unit_line_code = f"{record.work_unit_id.work_unit_code}"
-            record.work_unit_line_name = f"{record.work_unit_id.work_unit_name}"
+            record.name = f"{record.work_unit_id.work_unit_name}"
 
-    @api.depends('work_unit_id')
+    @api.depends('work_unit_id', 'work_unit_id.is_duplicate')
     def _get_duplicate_status(self):
         for record in self:
-            record.is_duplicate = record.work_unit_id.is_duplicate
+            record.is_duplicate = record.work_unit_id.is_duplicate if record.work_unit_id else False

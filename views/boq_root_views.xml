@@ -51,12 +51,19 @@
                         </group>
                     </group>
                     <group string="Pekerjaan">
-                        <field name="work_unit_line_ids" nolabel="1" colspan="2">
+                        <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many" mode="tree" context="{'default_display_type': False}">
                             <tree editable="bottom">
+
+                                <control>
+                                    <create name="add_product_control" string="Add a product"/>
+                                    <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                    <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                </control>
+
                                 <field name="sequence" widget="handle" />
-                                <field name="work_unit_id" string="Kode Pekerjaan"/>
-                                <field name="work_unit_line_notes"/>
-                                <field name="work_unit_line_quantity"/>
+                                <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
+                                <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" optional="show"/>
+                                <field name="work_unit_line_quantity" required="not display_type"/>
                                 <field name="work_unit_line_uom"/>
                                 <field name="display_type" column_invisible="1"/>
                             </tree>

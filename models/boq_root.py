@@ -43,7 +43,7 @@ class BoqRoot(models.Model):
         comodel_name='boq.work_unit.line',
         inverse_name='boq_root_id',
         string='Work Unit Lines',
-        tracking=True,
+        # tracking=True,
         domain=[('is_duplicate', '=', False)]
         
     )
