@@ -57,7 +57,7 @@ class BoqWorkUnitLine(models.Model):
     work_unit_line_uom = fields.Many2one(
         comodel_name="uom.uom",
         string="Unit",
-        required=True,
+        # required=True,
         help="Unit of Measure for the work unit line"
     )
 
@@ -68,16 +68,12 @@ class BoqWorkUnitLine(models.Model):
         ], default=False
     )
     
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
-        # if vals_list.get('display_type'):
-        #     vals_list.update(work_unit_id=False, work_unit_line_quantity=0)
-       
-        for vals in vals_list:
-            if vals.get('display_type') or self.default_get(['display_type']).get('display_type'):
-                vals['work_unit_line_quantity'] = 0.0
-       
-        return super().create(vals_list)
+            for vals in vals_list:
+                if vals.get('display_type', self.default_get(['display_type'])['display_type']):
+                    vals.update(work_unit_id=False, work_unit_line_quantity=0, work_unit_line_uom=False)
+            return super().create(vals_list)
     
     # before margin
     @api.depends('work_unit_id', 'work_unit_id.materials_price', 'work_unit_id.services_price', 'work_unit_id.others_price')
@@ -131,8 +127,11 @@ class BoqWorkUnitLine(models.Model):
     @api.depends('work_unit_id')
     def _get_work_unit_components(self):
         for record in self:
-            record.work_unit_line_code = f"{record.work_unit_id.work_unit_code}"
-            record.name = f"{record.work_unit_id.work_unit_name}"
+            if record.work_unit_id and not record.display_type:
+                record.work_unit_line_code = f"{record.work_unit_id.work_unit_code}"
+                record.name = f"{record.work_unit_id.work_unit_name}"
+            else:
+                record.work_unit_line_code = ""
 
     @api.depends('work_unit_id', 'work_unit_id.is_duplicate')
     def _get_duplicate_status(self):

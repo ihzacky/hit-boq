@@ -94,7 +94,7 @@ class BoqRoot(models.Model):
         maintenance_total = maintenance_final = 0.0
 
         for line in lines:
-            if line.work_unit_line_code.startswith('MNT'):
+            if line.work_unit_line_code and line.work_unit_line_code.startswith('MNT'):
                 maintenance_total += line.service_price_final or 0.0
                 maintenance_final += line.service_price_after_margin_final or 0.0
             else:

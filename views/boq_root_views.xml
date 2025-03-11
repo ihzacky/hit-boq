@@ -55,7 +55,7 @@
                         </group>
                     </group>
                     <group string="Pekerjaan">
-                        <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many" mode="tree" context="{'default_display_type': False}">
+                        <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many">
                             <tree editable="bottom">
 
                                 <control>
@@ -68,7 +68,7 @@
                                 <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
                                 <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" optional="show"/>
                                 <field name="work_unit_line_quantity" required="not display_type"/>
-                                <field name="work_unit_line_uom"/>
+                                <field name="work_unit_line_uom" required="not display_type" />
                                 <field name="display_type" column_invisible="1"/>
                             </tree>
                         </field>

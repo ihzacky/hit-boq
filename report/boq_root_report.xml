@@ -74,8 +74,8 @@
                                 <t t-set="row_num" t-value="1"/>
                                 <t t-set="current_category" t-value="False"/>
                                 <t t-set="has_maintenance" t-value="False"/>
-                                <t t-set="maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code.startswith('MNT'))"/>
-                                <t t-set="non_maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: not l.work_unit_line_code.startswith('MNT'))"/>
+                                <t t-set="maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and l.work_unit_line_code.startswith('MNT'))"/>
+                                <t t-set="non_maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and not l.work_unit_line_code.startswith('MNT'))"/>
                                 <t t-set="last_maintenance_line" t-value="maintenance_lines[-1] if maintenance_lines else False"/>
                                 <t t-set="last_non_maintenance_line" t-value="non_maintenance_lines[-1] if non_maintenance_lines else False"/>
 
