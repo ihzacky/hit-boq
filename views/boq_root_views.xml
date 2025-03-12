@@ -67,6 +67,7 @@
                                 <field name="sequence" widget="handle" />
                                 <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
                                 <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" optional="show"/>
+                                <field name="work_unit_line_code" string="Kode Pekerjaan(w.u.l)" column_invisible="1"/>
                                 <field name="work_unit_line_quantity" required="not display_type"/>
                                 <field name="work_unit_line_uom" required="not display_type" />
                                 <field name="display_type" column_invisible="1"/>

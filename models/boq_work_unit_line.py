@@ -6,13 +6,13 @@ from odoo.tools.translate import _
 class BoqWorkUnitLine(models.Model):
     _name = 'boq.work_unit.line'
     _description = 'BoQ Work Unit Line'
-    _order = 'sequence, id'
+    _order = 'sequence'
 
     
     sequence = fields.Integer(string="Sequence", default=1)
     is_duplicate = fields.Boolean(compute='_get_duplicate_status', store=True)
-    work_unit_line_code = fields.Char(string='Kode Pekerjaan', compute='_get_work_unit_components', store=True)
     name = fields.Char(string='Nama Pekerjaan', compute='_get_work_unit_components', store=True, readonly=False, required=True)
+    work_unit_line_code = fields.Char(string='Kode Pekerjaan', compute='_get_work_unit_components', readonly=False, store=True)
     work_unit_line_quantity = fields.Float(string='Quantity', default=1)
     work_unit_line_notes = fields.Text(string="Work Unit Notes")
 
@@ -124,16 +124,13 @@ class BoqWorkUnitLine(models.Model):
             if record.service_base_price_after_margin:
                 record.service_price_after_margin_final = record.service_base_price_after_margin * record.work_unit_line_quantity
 
-    @api.depends('work_unit_id')
+    @api.depends('work_unit_id', 'work_unit_id.work_unit_code', 'display_type')
     def _get_work_unit_components(self):
         for record in self:
-            if record.work_unit_id and not record.display_type:
-                record.work_unit_line_code = f"{record.work_unit_id.work_unit_code}"
-                record.name = f"{record.work_unit_id.work_unit_name}"
-            else:
-                record.work_unit_line_code = ""
+            record.work_unit_line_code = record.work_unit_id.work_unit_code
+            record.name = record.work_unit_id.work_unit_name
 
     @api.depends('work_unit_id', 'work_unit_id.is_duplicate')
     def _get_duplicate_status(self):
         for record in self:
-            record.is_duplicate = record.work_unit_id.is_duplicate if record.work_unit_id else False
+            record.is_duplicate = record.work_unit_id.is_duplicate if record.work_unit_id else False    
