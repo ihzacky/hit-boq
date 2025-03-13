@@ -29,12 +29,10 @@
                     <button string="Print Report" 
                             type="object" 
                             class="btn-primary" 
-                            name="action_print_report"
-                    />
+                            name="action_print_report"/>
                     <button name="preview_pdf"
                             string="Print Preview"
-                            type="object"
-                    />
+                            type="object"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

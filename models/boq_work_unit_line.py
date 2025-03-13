@@ -1,7 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
-from odoo.tools.translate import _
-
+from math import ceil
 
 class BoqWorkUnitLine(models.Model):
     _name = 'boq.work_unit.line'
@@ -44,7 +42,8 @@ class BoqWorkUnitLine(models.Model):
     
     boq_root_id = fields.Many2one(
         comodel_name='boq.root',
-        string='BoQ Root'
+        string='BoQ Root',
+        ondelete='cascade'
     )
 
     currency_id = fields.Many2one(
@@ -79,9 +78,10 @@ class BoqWorkUnitLine(models.Model):
     @api.depends('work_unit_id', 'work_unit_id.materials_price', 'work_unit_id.services_price', 'work_unit_id.others_price')
     def _get_base_price(self):
         for record in self:
-            record.material_base_price = record.work_unit_id.materials_price
-            record.service_base_price = record.work_unit_id.services_price
-            record.others_base_price = record.work_unit_id.others_price
+            # Round up to nearest thousand
+            record.material_base_price = ceil(record.work_unit_id.materials_price / 1000) * 1000
+            record.service_base_price = ceil(record.work_unit_id.services_price / 1000) * 1000
+            record.others_base_price = ceil(record.work_unit_id.others_price / 1000) * 1000
         
     @api.depends('material_base_price', 'service_base_price', 'others_base_price', 'work_unit_line_quantity')
     def _compute_components_price_final(self):
@@ -133,4 +133,4 @@ class BoqWorkUnitLine(models.Model):
     @api.depends('work_unit_id', 'work_unit_id.is_duplicate')
     def _get_duplicate_status(self):
         for record in self:
-            record.is_duplicate = record.work_unit_id.is_duplicate if record.work_unit_id else False    
+            record.is_duplicate = record.work_unit_id.is_duplicate if record.work_unit_id else False

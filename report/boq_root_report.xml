@@ -6,6 +6,8 @@
         <field name="model">boq.root</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">hit_boq.report_boq</field>
+        <field name="report_file">hit_boq.report_boq</field>
+        <field name="print_report_name">'BoQ - %s' % object.boq_code</field>
         <field name="binding_model_id" ref="model_boq_root"/>
         <field name="binding_type">report</field>
     </record>
@@ -96,7 +98,8 @@
                                         <!-- Note Line -->
                                         <t t-elif="line.display_type == 'line_note' and (line.id not in printed_notes)">
                                             <td colspan="2"></td>
-                                            <td colspan="9" style="background-color: white;">
+                                            <!-- <td colspan="9" style="background-color: white;"> -->
+                                            <td style="white-space: pre-line;" name="td_note_line" colspan="9">
                                                 <span t-field="line.name"/>
                                             </td>
                                             <td style="border-top-style: none; border-bottom-style: none;"></td>
@@ -132,7 +135,7 @@
                                             <!-- Separator column -->
                                             <td style="border-top-style: none; border-bottom-style: none;"></td>
 
-                                            <!-- Harga Satuan After Margin -->
+                                            <!-- Harga Satuan Before Margin -->
                                             <td class="text-right">
                                                 <span t-esc="'{:,.0f}'.format(line.material_base_price or 0)"/>
                                             </td>
@@ -158,9 +161,7 @@
                                     <t t-if="line == last_installation_line">
                                         <!-- Display any notes that come before total line -->
                                         <t t-foreach="doc.work_unit_line_ids" t-as="next_line">
-                                            <t t-if="(next_line.sequence - line.sequence == 1) 
-                                                     and next_line.display_type == 'line_note' 
-                                                     and (next_line.id not in printed_notes)">
+                                            <t t-if="(next_line.sequence - line.sequence == 1) and next_line.display_type == 'line_note' and (next_line.id not in printed_notes)">
                                                 <tr>
                                                     <td colspan="2"></td>
                                                     <td colspan="9">
@@ -203,7 +204,7 @@
                                                      and (next_line.id not in printed_notes)">
                                                 <tr>
                                                     <td colspan="2"></td>
-                                                    <td colspan="9">
+                                                    <td style="white-space: pre-line;" colspan="9">
                                                         <span t-field="next_line.name"/>
                                                     </td>
                                                     <td style="border-top-style: none; border-bottom-style: none;"></td>
