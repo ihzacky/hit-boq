@@ -58,13 +58,5 @@
             parent="menu_work_unit"
             sequence="12"
         />
-
-        <!-- <menuitem
-            id="menu_boq_const"
-            name="BoQ Const"
-            action="action_menu_boq_const"
-            parent="menu_boq"
-        /> -->
-        
     </data>
 </odoo>

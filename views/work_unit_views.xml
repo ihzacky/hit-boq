@@ -16,7 +16,6 @@
                 <field name="work_unit_name"/>
                 <field name="price_unit" />
                 <field name="state"/>
-                <field name="is_duplicate" invisible="0"/>
             </tree>
         </field>
     </record>
@@ -29,7 +28,6 @@
             <form string="BoQ Form">
                 <header>
                     <button string="Save" type="object" name="action_save" class="btn-primary"/>
-                    <!-- <button string="Refresh Prices" type="object" name="action_refresh" class="btn-outline-warning"/> -->
 
                     <!-- Buttons for 'Draft' State -->
                     <button name="action_state_waiting" string="Submit for Approval" type="object"
@@ -116,7 +114,6 @@
                                 <field name="others_uom"/>   
                                 <field name="others_base_price"/>   
                                 <field name="others_price_final"/>
-                                
                             </tree>
                         </field>
                         <field name="others_price"/>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Action - Modified to show form only -->
+
     <record id="action_menu_boq_const" model="ir.actions.act_window">
         <field name="name">BoQ Const</field>
         <field name="res_model">boq.const</field>
         <field name="view_mode">form</field>
-        <field name="res_id">1</field>  <!-- Assuming ID 1 is your constant record -->
+        <field name="res_id">1</field> 
         <field name="target">inline</field>
     </record>
 

@@ -6,7 +6,6 @@ class BoqMaterial(models.Model):
     _description = 'BoQ Satuan Pekerjaan - Material'
     _inherit = "mail.thread"
     _order = "sequence, id"
-    # _rec_name = 'boq_materials'
 
     material_code = fields.Char(string='Kode Material')
     material_description = fields.Text(string='Deskripsi Material')

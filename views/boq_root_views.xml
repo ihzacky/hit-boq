@@ -68,11 +68,12 @@
                                 <field name="work_unit_line_code" string="Kode Pekerjaan(w.u.l)" column_invisible="1"/>
                                 <field name="work_unit_line_quantity" required="not display_type"/>
                                 <field name="work_unit_line_uom" required="not display_type" />
+                                <field name="work_unit_line_price_master" required="not display_type"/>
+                                <field name="work_unit_line_price_override" required="not display_type"/>
                                 <field name="display_type" column_invisible="1"/>
                             </tree>
                         </field>
                         <field name="price_final" readonly="1" invisible="1"/>
-                        <field name="notes_work_unit" placeholder="Enter your work unit notes here..."/>
                     </group>
                     
                     <notebook>

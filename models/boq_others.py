@@ -28,7 +28,7 @@ class BoqOthers(models.Model):
     @api.depends('work_unit_id', 'others_name')
     def _compute_others_base_price(self):
         for record in self:
-            # If the record name is "lain-lain", check for the previous record named "keuntungan"
+            # if the record name is "lain-lain", check for the previous record named "keuntungan"
             if record.others_name and record.others_name.lower() == 'Lain-lain':
                 keuntungan_rec = self.search(
                     [('id', '<', record.id), ('others_name', '=', 'Keuntungan')],

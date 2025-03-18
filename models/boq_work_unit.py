@@ -1,8 +1,5 @@
 from odoo import models, fields, api 
 from odoo.fields import Command
-import logging
-
-_logger = logging.getLogger(__name__)
 
 class BoqWorkUnit(models.Model):
     _name = 'boq.work_unit'
@@ -101,15 +98,6 @@ class BoqWorkUnit(models.Model):
                 Command.create({'others_name': 'Keuntungan'}),
                 Command.create({'others_name': 'Lain-lain'}),
             ]
-
-    # def action_refresh(self):
-    #     self.ensure_one()
-    #     self.material_ids.recompute_material_price()
-    #     self.service_ids.recompute_service_price
-    #     self.others_ids.recompute_others_price()
-    #     self._compute_component_prices() 
-    #     self._compute_price_unit()
-    #     return True 
 
     def action_save(self):
         self.ensure_one()
@@ -295,14 +283,7 @@ class BoqWorkUnit(models.Model):
                     self.env['boq.service'].create(vals)
                 for vals in others_to_create:
                     self.env['boq.others'].create(vals)
-                
-            
-                # # This cause endless recursive loop
-                # # Update status and state from duplicate
-                # record.write({
-                #     'state': previous_version.state,
-                #     'revision_count': previous_version.revision_count
-                # })
+
                 
                 return True
 
