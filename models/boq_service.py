@@ -5,13 +5,13 @@ class BoqService(models.Model):
     _name = 'boq.service'
     _description = 'BoQ Satuan Pekerjaan - Jasa'
     _order = "sequence, id"
-    # _rec_name = 'boq_jasa'
+    _inherit = "mail.thread"
 
-    service_name = fields.Char(string='Nama Jasa', tracking=True, required=True)
+    service_name = fields.Char(string='Nama Jasa', tracking=True, compute="_get_attributes_from_product")
     service_unit = fields.Char(string='Unit jasa')
     service_price = fields.Float(string='Final Price', compute='_compute_service_price_final')
     service_pre_price = fields.Monetary(string='Price After Profit', currency_field='currency_id', compute='_compute_service_price')
-    service_base_price = fields.Monetary(string='Base Price', currency_field='currency_id', compute='_get_service_base_price')
+    service_base_price = fields.Monetary(string='Base Price', currency_field='currency_id', compute='_get_attributes_from_product')
     
 
     service_quantity = fields.Float(string='Quantity', default=1)
@@ -26,7 +26,10 @@ class BoqService(models.Model):
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product", 
-        domain=[('type', '=', 'service')],
+        domain=[
+            ('type', '=', 'service'),
+            ('is_service', '=', 'True')
+        ],
     )
 
     currency_id = fields.Many2one(
@@ -58,9 +61,10 @@ class BoqService(models.Model):
     ]
 
     @api.depends('product_id', 'product_id.lst_price')
-    def _get_service_base_price(self):
+    def _get_attributes_from_product(self):
         for record in self:
             record.service_base_price = record.product_id.lst_price if record.product_id else 0.0
+            record.service_name = record.product_id.name if record.product_id else "Unavailable"
     
     @api.depends('service_base_price', 'service_quantity', 'additional_product_tag_ids', 'work_unit_id.profit_percentage')
     def _compute_service_price(self):

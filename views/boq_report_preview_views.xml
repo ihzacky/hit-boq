@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Preview View -->
+    <record id="view_boq_root_preview_form" model="ir.ui.view">
+        <field name="name">view.boq.root.preview.form</field>
+        <field name="model">boq.root</field>
+        <field name="arch" type="xml">
+            <form string="BoQ Preview">
+                <sheet>
+                    <header>
+                        <button string="Print to PDF" type="object" name="action_print_report"
+                                class="btn-primary"/>
+                    </header>
+
+                    <group>
+                        <group>
+                            <field name="boq_name" string="Nama BoQ" readonly="1"/>
+                            <field name="boq_code" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="state" string="State" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Preview">
+                        <field name="preview_html" widget="html" nolabel="1" colspan="2"/> 
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

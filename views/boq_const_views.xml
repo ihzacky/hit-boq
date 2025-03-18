@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_menu_boq_const" model="ir.actions.act_window">
+        <field name="name">BoQ Const</field>
+        <field name="res_model">boq.const</field>
+        <field name="view_mode">form</field>
+        <field name="res_id">1</field> 
+        <field name="target">inline</field>
+    </record>
+
+    <record id="menu_boq_const_tree" model="ir.ui.view">
+        <field name="name">menu.boq.const.tree</field>
+        <field name="model">boq.const</field>
+        <field name="arch" type="xml">
+            
+            <tree string="boq const tree">
+                <field name="profit_percentage"/>
+                <field name="material_margin"/>
+                <field name="installation_margin" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="menu_boq_const_form" model="ir.ui.view">
+        <field name="name">menu.boq.form</field>
+        <field name="model">boq.const</field>
+        <field name="arch" type="xml">
+            <form string="BoQ Constants" create="false" delete="false">
+                <sheet>
+                    <h2>
+                        BoQ Variables
+                    </h2>
+                    <group string="Satuan Pekerjaan">
+                        <field name="material_margin" string="Margin Material"/>
+                        <field name="installation_margin" string="Margin Instalasi"/>
+                    </group>
+                    <group string="BoQ">
+                        <field name="profit_percentage" string="Persentase Keuntungan"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

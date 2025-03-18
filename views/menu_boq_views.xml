@@ -15,8 +15,23 @@
         />
 
         <menuitem
+            id="menu_boq_root_home"
+            name="Home"
+            action="action_menu_boq_root"
+            parent="menu_boq_root"
+            sequence="10"
+        />
+
+        <menuitem
+            id="menu_boq_root_variable"
+            name="BoQ Variable"
+            action="action_menu_boq_const"
+            parent="menu_boq_root"
+            sequence="10"/>
+
+        <menuitem
             id="menu_work_unit"
-            name="Harga Satuan Pekerjaan"
+            name="Satuan Pekerjaan"
             parent="menu_boq"
         />
        
@@ -31,7 +46,7 @@
         <menuitem
             id="menu_work_unit_material"
             name="Material"
-            action="action_menu_work_unit_material"
+            action="action_menu_material_products"
             parent="menu_work_unit"
             sequence="11"
         />
@@ -39,17 +54,9 @@
         <menuitem
             id="menu_work_unit_service"
             name="Jasa"
-            action="action_menu_work_unit_service"
+            action="action_menu_service_products"
             parent="menu_work_unit"
             sequence="12"
-        />
-        
-        <menuitem
-            id="menu_work_unit_others"
-            name="Lain-lain"    
-            action="action_menu_work_unit_others"
-            parent="menu_work_unit"
-            sequence="13"
         />
     </data>
 </odoo>

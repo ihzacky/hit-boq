@@ -6,8 +6,8 @@ class BoqOthers(models.Model):
     _rec_name = 'others_name'
 
     others_name = fields.Char(string="Nama Lain-Lain")
-    others_base_price = fields.Monetary(string="Harga/Unit", currency_fields="currency_id", compute="_compute_others_base_price")
-    others_price_final = fields.Monetary(string="Harga", currency_fields="currency_id", compute="_compute_others_price_final")
+    others_base_price = fields.Monetary(string="Harga/Unit", currency_field='currency_id', compute="_compute_others_base_price")
+    others_price_final = fields.Monetary(string="Harga", currency_field='currency_id', compute="_compute_others_price_final")
     others_quantity = fields.Float(string="Quantity", default=0)
     others_uom = fields.Char(string="Unit", default="%", readonly=True)
 
@@ -28,7 +28,7 @@ class BoqOthers(models.Model):
     @api.depends('work_unit_id', 'others_name')
     def _compute_others_base_price(self):
         for record in self:
-            # If the record name is "lain-lain", check for the previous record named "keuntungan"
+            # if the record name is "lain-lain", check for the previous record named "keuntungan"
             if record.others_name and record.others_name.lower() == 'Lain-lain':
                 keuntungan_rec = self.search(
                     [('id', '<', record.id), ('others_name', '=', 'Keuntungan')],

@@ -4,13 +4,13 @@ from math import ceil
 class BoqMaterial(models.Model):
     _name = 'boq.material'
     _description = 'BoQ Satuan Pekerjaan - Material'
+    _inherit = "mail.thread"
     _order = "sequence, id"
-    # _rec_name = 'boq_materials'
 
     material_code = fields.Char(string='Kode Material')
     material_description = fields.Text(string='Deskripsi Material')
     material_unit = fields.Char(string='Unit dari Material')
-    material_price_final = fields.Monetary(string="Harga Final Material", currency_field="currency_id", compute="_compute_material_price_final")
+    material_price = fields.Monetary(string="Harga Final Material", currency_field="currency_id", compute="_compute_material_price_final")
     material_quantity = fields.Float(string="Quantity", default=1)
     
     sequence = fields.Integer(string="Sequence", default="1")
@@ -18,7 +18,10 @@ class BoqMaterial(models.Model):
     product_id = fields.Many2one(
         comodel_name="product.product", 
         string="Product",
-        domain=[('type', '=', 'consu')], 
+        domain=[
+            ('type', '=', 'consu'),
+            ('is_material', '=', 'True')
+        ], 
         tracking=True,
     )
     
@@ -51,7 +54,7 @@ class BoqMaterial(models.Model):
         tracking=True,
     )
 
-    material_price = fields.Monetary(
+    material_pre_price = fields.Monetary(
         string="Price After Profit",
         currency_field='currency_id',
         compute='_compute_material_price',
@@ -69,12 +72,12 @@ class BoqMaterial(models.Model):
         for record in self:
             profit_decimal = record.work_unit_id.profit_percentage / 100
             base_calculation = record.material_base_price / (1 - profit_decimal)
-            record.material_price = ceil(base_calculation / 100) * 100
+            record.material_pre_price = ceil(base_calculation / 100) * 100
 
     @api.depends('material_quantity', 'material_base_price')
     def _compute_material_price_final(self):
         for record in self:
-            record.material_price_final = record.material_quantity * record.material_price
+            record.material_price = record.material_quantity * record.material_pre_price
 
     def recompute_material_price(self):
         for record in self:

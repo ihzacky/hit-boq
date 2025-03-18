@@ -1,4 +1,5 @@
 {
     "python.languageServer": "None",
-    "Odoo.selectedConfiguration": "1"
+    "Odoo.selectedConfiguration": "1",
+    "CodeGPT.apiKey": "LM Studio"
 }

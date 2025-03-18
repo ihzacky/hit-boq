@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action Definition -->
+    <record id="action_report_boq" model="ir.actions.report">
+        <field name="name">BoQ Report</field>
+        <field name="model">boq.root</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hit_boq.report_boq</field>
+        <field name="report_file">hit_boq.report_boq</field>
+        <field name="print_report_name">'BoQ - %s' % object.boq_code</field>
+        <field name="binding_model_id" ref="model_boq_root"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_boq">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Report Header -->
+                        <h2 t-field="doc.boq_name" style="text-align: left;"/>
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong>Kode BoQ:</strong> <span t-field="doc.boq_code"/><br/>
+                                <strong>Updated Date:</strong> <span t-field="doc.updated_date" t-options='{"widget": "date", "format": "dd-MMM-yy"}'/><br/>
+                                <strong>Updated By:</strong> <span t-field="doc.updated_by"/>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Margin Material:</strong> <span t-field="doc.material_margin"/><br/>
+                                <strong>Margin Instalasi:</strong> <span t-field="doc.installation_margin"/>
+                            </div>
+                        </div>
+
+                        <!-- Main Table -->
+                        <table class="table table-responsive table-sm" style="font-size: 10px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width: 3%;">No.</th>
+                                    <th rowspan="2" style="width: 8%;">Kode</th>
+                                    <th rowspan="2" style="width: 26%;">Pekerjaan</th>
+                                    <th rowspan="2" style="width: 3%;">Qty</th>
+                                    <th rowspan="2" style="width: 4%;">Unit</th>
+                                    <!-- Harga Satuan section -->
+                                    <th colspan="3" class="text-center">Harga Satuan</th>
+                                    <!-- Harga section -->
+                                    <th colspan="3" class="text-center">Harga</th>
+                                    <!-- Separator column -->
+                                    <th rowspan="1" style="width: 2%; border-top-style: none; border-bottom-style: none;"></th>
+                                    <!-- Harga Satuan After Margin section -->
+                                    <th colspan="3" class="text-center">Harga Satuan</th>
+                                    <!-- Harga After Margin section -->
+                                    <th colspan="3" class="text-center">Harga</th>
+                                </tr>
+                                <tr>
+                                    <!-- Harga Satuan columns -->
+                                    <th style="width: 7%;">Material</th>
+                                    <th style="width: 7%;">Instalasi</th>
+                                    <th style="width: 7%;">Lain-Lain</th>
+                                    <!-- Harga columns -->
+                                    <th style="width: 7%;">Material</th>
+                                    <th style="width: 7%;">Instalasi</th>
+                                    <th style="width: 7%;">Lain-Lain</th>
+                                    <!-- Separator column is already defined in the row above -->
+                                    <th rowspan="1" style="width: 2%; border-top-style: none; border-bottom-style: none;"></th>
+                                    <!-- Harga Satuan After Margin columns -->
+                                    <th style="width: 7%;">Material</th>
+                                    <th style="width: 7%;">Instalasi</th>
+                                    <th style="width: 7%;">Lain-Lain</th>
+                                    <!-- Harga After Margin columns -->
+                                    <th style="width: 7%;">Material</th>
+                                    <th style="width: 7%;">Instalasi</th>
+                                    <th style="width: 7%;">Lain-Lain</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Content rows grouped by category -->
+                                <t t-set="row_num" t-value="1"/>
+                                <t t-set="current_category" t-value="False"/>
+                                <t t-set="has_maintenance" t-value="False"/>
+                                <t t-set="maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and l.work_unit_line_code.startswith('MNT'))"/>
+                                <t t-set="installation_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and not l.work_unit_line_code.startswith('MNT'))"/>
+                                <t t-set="last_maintenance_line" t-value="maintenance_lines[-1] if maintenance_lines else False"/>
+                                <t t-set="last_installation_line" t-value="installation_lines[-1] if installation_lines else False"/>
+                                <t t-set="printed_notes" t-value="[]"/>
+
+                                <t t-foreach="doc.work_unit_line_ids" t-as="line">
+                                    <tr>
+                                        <!-- Section Line -->
+                                        <t t-if="line.display_type == 'line_section'">
+                                            
+                                            <td colspan="11" style="font-weight: bold; background-color: #E9ECEF">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td style="border-top-style: none; border-bottom-style: none;"></td>
+                                            <td colspan="6"></td>
+                                        </t>
+
+                                        <!-- Note Line -->
+                                        <t t-elif="line.display_type == 'line_note' and (line.id not in printed_notes)">
+                                            <td colspan="2"></td>
+                                            <!-- <td colspan="9" style="background-color: white;"> -->
+                                            <td style="white-space: pre-line;" name="td_note_line" colspan="9">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td style="border-top-style: none; border-bottom-style: none;"></td>
+                                            <td colspan="6" style="background-color: white"></td>
+                                            <t t-set="printed_notes" t-value="printed_notes + [line.id]"/>
+                                        </t>
+
+                                        <t t-elif="not line.display_type">
+                                            <td><span t-esc="row_num"/></td>
+                                            <td><span t-field="line.work_unit_line_code"/></td>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-right"><span t-field="line.work_unit_line_quantity"/></td>
+                                            <td><span t-field="line.work_unit_line_uom.name"/></td>
+                                            
+                                            <!-- Harga Satuan After Margin -->
+                                            <td class="text-right">
+                                                <t t-if="line.material_base_price_after_margin">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_base_price_after_margin)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.service_base_price_after_margin">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_base_price_after_margin)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.others_base_price">
+                                                    <span t-esc="'{:,.0f}'.format(line.others_base_price)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            
+                                            <!-- Harga After Margin -->
+                                            <td class="text-right">
+                                                <t t-if="line.material_price_after_margin_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_price_after_margin_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.service_price_after_margin_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_price_after_margin_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.others_price_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.others_price_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+
+                                            <!-- Separator column -->
+                                            <td style="border-top-style: none; border-bottom-style: none;"></td>
+
+                                            <!-- Harga Satuan Before Margin -->
+                                            <td class="text-right">
+                                                <t t-if="line.material_base_price">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_base_price)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.service_base_price">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_base_price)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.others_base_price">
+                                                    <span t-esc="'{:,.0f}'.format(line.others_base_price)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            
+                                            <!-- Harga Before Margin -->
+                                            <td class="text-right">
+                                                <t t-if="line.material_price_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_price_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.service_price_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_price_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="line.others_price_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.others_price_final)"/>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+
+                                            <t t-set="row_num" t-value="row_num + 1"/>
+                                        </t>
+                                    </tr>
+
+                                    <!-- Add TOTAL Installation after the last non-installation line -->
+                                    <t t-if="line == last_installation_line">
+                                        <!-- Display any notes that come before total line -->
+                                        <t t-foreach="doc.work_unit_line_ids" t-as="next_line">
+                                            <t t-if="(next_line.sequence - line.sequence == 1) and next_line.display_type == 'line_note' and (next_line.id not in printed_notes)">
+                                                <tr>
+                                                    <td colspan="2"></td>
+                                                    <td colspan="9">
+                                                        <span t-field="next_line.name"/>
+                                                    </td>
+                                                    <td style="border-top-style: none; border-bottom-style: none;"></td>
+                                                    <td colspan="6" style="background-color: white"></td>
+                                                </tr>
+                                                <t t-set="printed_notes" t-value="printed_notes + [next_line.id]"/>
+                                            </t>
+                                        </t>
+                                        <tr style="background-color: rgb(213, 223, 235);">
+                                            <td colspan="8" class="text-right" style="font-weight: bold;">TOTAL Perangkat &amp; Instalasi</td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.material_price_final"/>
+                                            </td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.installation_price_final"/>
+                                            </td>
+                                            <td></td>
+                                            <!-- Separator column -->
+                                            <td style="border-top-style: none; border-bottom-style: none; background-color: white;"></td>
+                                            <td colspan="3"></td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.material_price_total"/>
+                                            </td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.installation_price_total"/>
+                                            </td>
+                                            <td style="background-color: transparent;"></td>
+                                        </tr>
+                                    </t>
+
+                                    <!-- Add TOTAL Maintenance only after the last maintenance line -->
+                                    <t t-if="line == last_maintenance_line">
+                                        <!-- Display any notes that come before maintenance total -->
+                                        <t t-foreach="doc.work_unit_line_ids" t-as="next_line">
+                                            <t t-if="(next_line.sequence - line.sequence == 1) 
+                                                     and next_line.display_type == 'line_note' 
+                                                     and (next_line.id not in printed_notes)">
+                                                <tr>
+                                                    <td colspan="2"></td>
+                                                    <td style="white-space: pre-line;" colspan="9">
+                                                        <span t-field="next_line.name"/>
+                                                    </td>
+                                                    <td style="border-top-style: none; border-bottom-style: none;"></td>
+                                                    <td colspan="6" style="background-color: white"></td>
+                                                </tr>
+                                                <t t-set="printed_notes" t-value="printed_notes + [next_line.id]"/>
+                                            </t>
+                                        </t>
+                                        <tr style="background-color: rgb(213, 223, 235);">
+                                            <!-- After Margin -->
+                                            <td colspan="8" class="text-right" style="font-weight: bold;">TOTAL Maintenance</td>
+                                            <td></td> <!-- material col -->
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.maintenance_price_inst_total"/> <!-- instalasi -->
+                                            </td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.maintenance_price_others_total"/> <!-- lain - lain -->
+                                            </td> 
+
+                                            <td style="border-top-style: none; border-bottom-style: none; background-color: white;"></td>
+                                            <!-- Before Margin -->
+                                            <td colspan="3"></td>
+                                            <td></td> <!-- material col -->
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.maintenance_price_inst_final"/> <!-- instalasi -->
+                                            </td>
+                                            <td class="text-right" style="font-weight: bold;">
+                                                <span t-field="doc.maintenance_price_others_final"/>
+                                            </td><!-- Lain-Lain> -->
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4" t-if="doc.notes_exclude">
+                            <div class="col-12">
+                                <strong>Exclude:</strong>
+                                <p><span t-field="doc.notes_exclude"/></p>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <strong>Note:</strong>
+                                <p><span t-field="doc.notes_general"/></p>
+                            </div>
+                        </div>  
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
