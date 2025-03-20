@@ -26,13 +26,23 @@
         <field name="arch" type="xml">
             <form string="BoQ Form">
                 <header>
+                    <button name="%(hit_boq.action_view_boq_adapter_sale)d" 
+                            string="Create Sale Order"
+                            type="action"
+                            class="btn-primary"
+                            context="{'default_boq_id': active_id}"/>
                     <button string="Print Report" 
                             type="object" 
-                            class="btn-primary" 
+                            class="btn-secondary" 
                             name="action_print_report"/>
                     <button name="preview_pdf"
                             string="Print Preview"
                             type="object"/>
+                    <button name="action_recompute_all_prices"
+                            string="Recompute Prices"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="0"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

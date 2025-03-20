@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_view_boq_adapter_sale" model="ir.actions.act_window">
+        <field name="name">Create Sale Order</field>
+        <field name="res_model">boq.adapter.sale</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_boq_root"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <record id="view_boq_adapter_sale" model="ir.ui.view">
+        <field name="name">boq.adapter.sale.form</field>
+        <field name="model">boq.adapter.sale</field>
+        <field name="arch" type="xml">
+            <form string="BoQ Sales Order">
+                <group>
+                    <field name="company_id" invisible="1"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="payment_term_id" string="Payment Terms"/>
+                </group>
+
+                <footer>
+                    <button name="create_sale_order" type="object"
+                            id="create_sale_order_open"
+                            string="Create"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -78,6 +78,8 @@ class BoqRoot(models.Model):
         string="BoQ Const",
         default=1
     )
+
+    sale_order_adapter_id = fields.One2many(comodel_name='boq.adapter.sale', inverse_name='boq_id')
     
     def write(self, vals):
         vals.update({
@@ -124,11 +126,11 @@ class BoqRoot(models.Model):
 
             record.material_price_total = material_total
             record.installation_price_total = installation_total
-            record.price_total = sum([material_total, installation_total])
+            record.price_total = sum([material_total, installation_total, record.maintenance_price_total])
 
             record.material_price_final = material_final
             record.installation_price_final = installation_final
-            record.price_final = sum([material_final, installation_final])
+            record.price_final = sum([material_final, installation_final, record.maintenance_price_final])
 
     @api.depends(
         'work_unit_line_ids', 
@@ -211,3 +213,18 @@ class BoqRoot(models.Model):
 
     def action_print_report(self):
         return self.env.ref('hit_boq.action_report_boq').report_action(self)
+
+    def action_recompute_all_prices(self):
+        self.ensure_one()
+        # Recompute work unit lines
+        for line in self.work_unit_line_ids:
+            line._get_base_price()
+            line._compute_components_price_final()
+            line._compute_components_price_after_margin()
+            line._compute_components_price_after_margin_final()
+        
+        # Recompute BoQ totals
+        self._compute_boq_price()
+        self._compute_maintenance_price()
+        
+        return True
