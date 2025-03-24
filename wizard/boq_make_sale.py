@@ -35,7 +35,9 @@ class BoqAdapterSale(models.TransientModel):
             'date_order': fields.Datetime.now(),
             'partner_id': self.partner_id.id,
             'payment_term_id': self.payment_term_id.id,
-            'state': 'draft'
+            'state': 'draft',
+            'boq_id': self.boq_id.id,
+            'boq_name': self.boq_id.boq_name
         })
 
         self.create_sale_order_line(sale_order.id)

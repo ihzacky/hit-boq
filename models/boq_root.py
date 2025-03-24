@@ -79,6 +79,8 @@ class BoqRoot(models.Model):
         default=1
     )
 
+    sale_order_id = fields.One2many('sale.order', 'boq_id')
+
     sale_order_adapter_id = fields.One2many(comodel_name='boq.adapter.sale', inverse_name='boq_id')
     
     def write(self, vals):

@@ -6,10 +6,11 @@
     "website": "https://yourcompany.com",
     "version": "1.0.0",
     "category": "Customizations",
-    "depends": ["base", "product", "mail", "sale"],
+    "depends": ["base", "product", "mail", "sale", "project"],
     "data": [
         "wizard/boq_make_sale_views.xml",
 
+        "views/sale_order_views.xml",
         "views/boq_report_preview_views.xml",
         "views/boq_const_views.xml",
         "views/product_views.xml",
