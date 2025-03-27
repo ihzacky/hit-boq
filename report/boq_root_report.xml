@@ -22,8 +22,8 @@
                         <div class="row mb-4">
                             <div class="col-6">
                                 <strong>Kode BoQ:</strong> <span t-field="doc.boq_code"/><br/>
-                                <strong>Updated Date:</strong> <span t-field="doc.updated_date" t-options='{"widget": "date", "format": "dd-MMM-yy"}'/><br/>
-                                <strong>Updated By:</strong> <span t-field="doc.updated_by"/>
+                                <strong>Updated Date:</strong> <span t-field="doc.last_update" t-options='{"widget": "date", "format": "dd-MMM-yy"}'/><br/>
+                                <strong>Updated By:</strong> <span t-field="doc.modified_by"/>
                             </div>
                             <div class="col-6 text-right">
                                 <strong>Margin Material:</strong> <span t-field="doc.material_margin"/><br/>
@@ -77,8 +77,8 @@
                                 <t t-set="row_num" t-value="1"/>
                                 <t t-set="current_category" t-value="False"/>
                                 <t t-set="has_maintenance" t-value="False"/>
-                                <t t-set="maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and l.work_unit_line_code.startswith('MNT'))"/>
-                                <t t-set="installation_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.work_unit_line_code and not l.work_unit_line_code.startswith('MNT'))"/>
+                                <t t-set="maintenance_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.code and l.code.startswith('MNT'))"/>
+                                <t t-set="installation_lines" t-value="doc.work_unit_line_ids.filtered(lambda l: l.code and not l.code.startswith('MNT'))"/>
                                 <t t-set="last_maintenance_line" t-value="maintenance_lines[-1] if maintenance_lines else False"/>
                                 <t t-set="last_installation_line" t-value="installation_lines[-1] if installation_lines else False"/>
                                 <t t-set="printed_notes" t-value="[]"/>
@@ -109,21 +109,21 @@
 
                                         <t t-elif="not line.display_type">
                                             <td><span t-esc="row_num"/></td>
-                                            <td><span t-field="line.work_unit_line_code"/></td>
+                                            <td><span t-field="line.code"/></td>
                                             <td><span t-field="line.name"/></td>
-                                            <td class="text-right"><span t-field="line.work_unit_line_quantity"/></td>
+                                            <td class="text-right"><span t-field="line.quantity"/></td>
                                             <td><span t-field="line.work_unit_line_uom.name"/></td>
                                             
                                             <!-- Harga Satuan After Margin -->
                                             <td class="text-right">
-                                                <t t-if="line.material_base_price_after_margin">
-                                                    <span t-esc="'{:,.0f}'.format(line.material_base_price_after_margin)"/>
+                                                <t t-if="line.material_margin_base">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_margin_base)"/>
                                                 </t>
                                                 <t t-else="">-</t>
                                             </td>
                                             <td class="text-right">
-                                                <t t-if="line.service_base_price_after_margin">
-                                                    <span t-esc="'{:,.0f}'.format(line.service_base_price_after_margin)"/>
+                                                <t t-if="line.service_margin_base">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_margin_base)"/>
                                                 </t>
                                                 <t t-else="">-</t>
                                             </td>
@@ -136,14 +136,14 @@
                                             
                                             <!-- Harga After Margin -->
                                             <td class="text-right">
-                                                <t t-if="line.material_price_after_margin_final">
-                                                    <span t-esc="'{:,.0f}'.format(line.material_price_after_margin_final)"/>
+                                                <t t-if="line.material_margin_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.material_margin_final)"/>
                                                 </t>
                                                 <t t-else="">-</t>
                                             </td>
                                             <td class="text-right">
-                                                <t t-if="line.service_price_after_margin_final">
-                                                    <span t-esc="'{:,.0f}'.format(line.service_price_after_margin_final)"/>
+                                                <t t-if="line.service_margin_final">
+                                                    <span t-esc="'{:,.0f}'.format(line.service_margin_final)"/>
                                                 </t>
                                                 <t t-else="">-</t>
                                             </td>
@@ -230,10 +230,10 @@
                                             <td style="border-top-style: none; border-bottom-style: none; background-color: white;"></td>
                                             <td colspan="3"></td>
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.material_price_total"/>
+                                                <span t-field="doc.material_base_cost"/>
                                             </td>
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.installation_price_total"/>
+                                                <span t-field="doc.installation_base_cost"/>
                                             </td>
                                             <td style="background-color: transparent;"></td>
                                         </tr>
@@ -262,10 +262,10 @@
                                             <td colspan="8" class="text-right" style="font-weight: bold;">TOTAL Maintenance</td>
                                             <td></td> <!-- material col -->
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.maintenance_price_inst_total"/> <!-- instalasi -->
+                                                <span t-field="doc.maintenance_inst_base"/> <!-- instalasi -->
                                             </td>
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.maintenance_price_others_total"/> <!-- lain - lain -->
+                                                <span t-field="doc.maintenance_others_base"/> <!-- lain - lain -->
                                             </td> 
 
                                             <td style="border-top-style: none; border-bottom-style: none; background-color: white;"></td>
@@ -273,10 +273,10 @@
                                             <td colspan="3"></td>
                                             <td></td> <!-- material col -->
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.maintenance_price_inst_final"/> <!-- instalasi -->
+                                                <span t-field="doc.maintenance_inst_final"/> <!-- instalasi -->
                                             </td>
                                             <td class="text-right" style="font-weight: bold;">
-                                                <span t-field="doc.maintenance_price_others_final"/>
+                                                <span t-field="doc.maintenance_others_final"/>
                                             </td><!-- Lain-Lain> -->
                                         </tr>
                                     </t>

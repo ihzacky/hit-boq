@@ -7,6 +7,8 @@
             name="BoQ"
         />
         
+        <!-- All BoQ Menu -->
+
         <menuitem
             id="menu_boq_root" 
             name="All BoQ" 
@@ -23,11 +25,14 @@
         />
 
         <menuitem
-            id="menu_boq_root_variable"
-            name="BoQ Variable"
-            action="action_menu_boq_const"
+            id="menu_boq_root_configuration"
+            name="BoQ Configuration"
+            action="action_menu_boq_conf"
             parent="menu_boq_root"
-            sequence="10"/>
+            sequence="10"
+        />
+
+        <!-- Satuan Pekerjaan Menu -->
 
         <menuitem
             id="menu_work_unit"
@@ -58,5 +63,25 @@
             parent="menu_work_unit"
             sequence="12"
         />
+
+        <!-- BoQ Sale Order -->
+        
+        <menuitem
+            id="menu_boq_sale_order"
+            name="Sale Order"
+            action="action_menu_sale_order_view"
+            parent="menu_boq"
+            sequence="13"
+        />
+
+
+        <!-- <menuitem
+            id="menu_boq_project"
+            name="BoQ Project"
+            action="action_menu_project"
+            parent="menu_boq"
+            sequence="13"
+        /> -->
+
     </data>
 </odoo>

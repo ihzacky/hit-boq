@@ -4,7 +4,6 @@ class BoqAdapterSale(models.TransientModel):
     _name = 'boq.adapter.sale'
     _description = 'Boq Adapter to Sale Order'
 
-
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string="Customer",
@@ -14,7 +13,7 @@ class BoqAdapterSale(models.TransientModel):
     payment_term_id = fields.Many2one(comodel_name='account.payment.term',
         string="Payment Terms",
         compute='_compute_payment_term_id',
-        store=True, readonly=False, precompute=True, check_company=True,  # Unrequired company
+        store=True, readonly=False, precompute=True, check_company=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"
     )
     company_id = fields.Many2one(
@@ -28,7 +27,6 @@ class BoqAdapterSale(models.TransientModel):
         required=True
     )
     
-
     def create_sale_order(self):
         sale_order = self.env['sale.order'].create({
             'origin': f'BoQ {self.boq_id.boq_code}',
@@ -51,24 +49,24 @@ class BoqAdapterSale(models.TransientModel):
             'context': {'create': False}
         }
 
-    def create_sale_order_line(self, sale_order_id):
+    def create_sale_order_line(self, sale_order_ids):
         product = self.env['product.product'].search([
-            ('name', '=', 'Generic Work Unit'),
+            ('name', '=', 'BoQ Work Unit'),
             ('type', '=', 'service')
         ], limit=1)
 
         if not product:
             product = self.env['product.product'].create({
-                'name': 'Generic Work Unit',
+                'name': 'BoQ Work Unit',
                 'type': 'service',
                 'detailed_type': 'service', 
             })
 
         for line in self.boq_id.work_unit_line_ids:
             if line.display_type:
-                # For section or note lines
+                # section or note lines
                 vals = {
-                    'order_id': sale_order_id,
+                    'order_id': sale_order_ids,
                     'display_type': line.display_type,
                     'name': line.name,
                     'sequence': line.sequence,
@@ -78,16 +76,16 @@ class BoqAdapterSale(models.TransientModel):
                     'product_uom': False,
                 }
             else:
-                # For regular product lines
+                # regular lines
                 vals = {
-                    'order_id': sale_order_id,
+                    'order_id': sale_order_ids,
                     'display_type': line.display_type,
                     'sequence': line.sequence,
                     'name': line.name,
                     'product_id': product.id,
                     'product_uom': line.work_unit_line_uom.id,
-                    'product_uom_qty': line.work_unit_line_quantity,
-                    'price_unit': line.work_unit_line_final_price,
+                    'product_uom_qty': line.quantity,
+                    'price_unit': line.final_price,
                 }
             
             self.env['sale.order.line'].create(vals)
