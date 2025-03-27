@@ -12,8 +12,8 @@
         <field name="model">boq.work_unit</field>
         <field name="arch" type="xml">
             <tree string="Work Unit Tree">
-                <field name="work_unit_code"/>
-                <field name="work_unit_name"/>
+                <field name="code"/>
+                <field name="name"/>
                 <field name="price_unit" />
                 <field name="state"/>
             </tree>
@@ -50,15 +50,16 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="work_unit_code"/>
+                            <field name="code"/>
                         </h1>
                     </div>
 
                     <group name="top">
                         <group>
-                            <field name="work_unit_name"/>
+                            <field name="name"/>
                             <field name="profit_percentage"/>
-                            <field name="boq_const_id" invisible="1"/>
+                            <field name="boq_conf_id" invisible="1"/>
+                            <field name="uom_id"/>
                             <field name="price_unit"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
@@ -67,8 +68,8 @@
                             <field name="status" readonly="1"/>
                             <field name="is_locked" readonly="1" invisible="1"/>
                             <field name="revision_count" readonly="1" invisible="1"/>
-                            <field name="updated_date" widget="datetime" readonly="1"/>
-                            <field name="updated_by" readonly="1"/>
+                            <field name="last_update" widget="datetime" readonly="1"/>
+                            <field name="modified_by" readonly="1"/>
                         </group>
                     </group>
 
@@ -85,8 +86,8 @@
                                 <field name="material_price"/>
                             </tree>
                         </field>
-                        <field name="materials_price"/>
-                        <field name="materials_note" />
+                        <field name="material_total"/>
+                        <field name="material_notes" />
                     </group>
                     
                     <group class="p-4 mb-4" string="Instalasi">
@@ -94,7 +95,7 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>
-                                <field name="additional_product_tag_ids" widget="many2many_tags"/>
+                                <field name="product_tag_ids" widget="many2many_tags"/>
                                 <field name="service_quantity"/>
                                 <field name="service_uom"/>
                                 <field name="service_base_price"/>
@@ -102,8 +103,8 @@
                                 <field name="service_price"/>
                             </tree>
                         </field>
-                        <field name="services_price"/>
-                        <field name="services_note" />
+                        <field name="service_total"/>
+                        <field name="service_notes" />
                     </group>
                     
                     <group class="p-4 mb-4" string="Lain-Lain">

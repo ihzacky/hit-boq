@@ -46,7 +46,7 @@ class BoqService(models.Model):
         readonly=True
     )
 
-    additional_product_tag_ids = fields.Many2many(
+    product_tag_ids = fields.Many2many(
         comodel_name='product.tag',
         string='Tags',
         related='product_id.product_tag_ids',
@@ -66,11 +66,11 @@ class BoqService(models.Model):
             record.service_base_price = record.product_id.lst_price if record.product_id else 0.0
             record.service_name = record.product_id.name if record.product_id else "Unavailable"
     
-    @api.depends('service_base_price', 'service_quantity', 'additional_product_tag_ids', 'work_unit_id.profit_percentage')
+    @api.depends('service_base_price', 'service_quantity', 'product_tag_ids', 'work_unit_id.profit_percentage')
     def _compute_service_price(self):
         for record in self:
             # Get service tags
-            tags = record.additional_product_tag_ids.mapped('name')
+            tags = record.product_tag_ids.mapped('name')
             
             # Check if any tag needs profit calculation
             needs_profit = any(tag in self.PROFIT_TAGS for tag in tags)
@@ -84,7 +84,7 @@ class BoqService(models.Model):
             else:
                 record.service_pre_price = record.service_base_price
 
-    @api.depends('service_base_price', 'service_quantity')
+    @api.depends('service_base_price', 'service_quantity', 'service_pre_price')
     def _compute_service_price_final(self):
         for record in self:
             record.service_price = record.service_pre_price * record.service_quantity

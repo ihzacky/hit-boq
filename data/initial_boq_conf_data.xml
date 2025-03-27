@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="default_boq_conf" model="boq.conf">
+            <field name="profit_percentage">15</field>
+            <field name="material_margin">0.95</field>
+            <field name="installation_margin">0.95</field>
+        </record>
+    </data>
+</odoo>

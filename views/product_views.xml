@@ -4,7 +4,7 @@
         <field name="res_model">product.product</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_material', '=', True)]</field>
-        <field name="context">{'default_is_material': True, 'default_type': 'consu'}</field>
+        <field name="context">{'default_is_material': True, 'default_type': 'consu', 'default_detailed_type': 'consu'}</field>
     </record>
 
     <record id="action_menu_service_products" model="ir.actions.act_window">
@@ -12,6 +12,6 @@
         <field name="res_model">product.product</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_service', '=', 'True')]</field>
-        <field name="context">{'default_is_service': 'True', 'default_type': 'service'}</field>
+        <field name="context">{'default_is_service': 'True', 'default_type': 'service', 'default_detailed_type': 'service'}</field>
     </record>
 </odoo>

@@ -5,49 +5,40 @@ class BoqWorkUnit(models.Model):
     _name = 'boq.work_unit'
     _description = 'BoQ Satuan Pekerjaan - Root'
     _inherit = 'mail.thread', 'mail.activity.mixin'
-    _rec_name = 'work_unit_code'
+    _rec_name = 'code'
     _order = 'sequence, id'
 
     is_locked = fields.Boolean(string="Locked", default=False, compute="_compute_is_locked")
     is_duplicate = fields.Boolean(default=False, store=True)
 
     sequence = fields.Integer(string="Sequence", default="1")
-    work_unit_code = fields.Char(string='Kode Pekerjaan')
-    work_unit_name = fields.Char(string='Nama Pekerjaan')
-    updated_date = fields.Datetime(string="Updated Date") 
-    updated_by = fields.Char(string="Updated By")
+    code = fields.Char(string='Kode Pekerjaan')
+    name = fields.Char(string='Nama Pekerjaan')
+    
+    last_update = fields.Datetime(string="Updated Date") 
+    modified_by = fields.Char(string="Updated By")
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('waiting', 'Waiting for Confirmation'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
     ], string="State", default='draft', readonly=True, tracking=True)
+    
     status = fields.Char(string="Status", compute="_compute_status", readonly=True, store=True)
-    revision_count = fields.Integer(string="Revision Count", default=0, readonly=True, store=True)
+    revision_count = fields.Integer(default=0, readonly=True, store=True)
 
     price_unit = fields.Monetary(string="Total Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True, store=True)
     
-    material_ids = fields.One2many(
-        comodel_name='boq.material', 
-        inverse_name="work_unit_id", 
-        string='Satuan Pekerjaan - Material'
-    )
-    materials_price = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
-    materials_note = fields.Text(string="Material Note  ")
+    material_ids = fields.One2many(comodel_name='boq.material', inverse_name="work_unit_id", string='Satuan Pekerjaan - Material')
+    material_total = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
+    material_notes = fields.Text(string="Material Note  ")
 
-    service_ids = fields.One2many(
-        comodel_name='boq.service', 
-        inverse_name="work_unit_id", 
-        string='Satuan Pekerjaan - Jasa'
-    )
-    services_price = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
-    services_note = fields.Text(string="Services Note")
+    service_ids = fields.One2many(comodel_name='boq.service', inverse_name="work_unit_id", string='Satuan Pekerjaan - Jasa')
+    service_total = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
+    service_notes = fields.Text(string="Services Note")
 
-    others_ids = fields.One2many(
-        comodel_name="boq.others", 
-        inverse_name="work_unit_id", 
-        string="Satuan Pekerjaan - Lain-Lain"
-    )
+    others_ids = fields.One2many(comodel_name="boq.others", inverse_name="work_unit_id", string="Satuan Pekerjaan - Lain-Lain")
     others_price = fields.Monetary(string="Harga Lain-Lain", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
 
     profit_percentage = fields.Float(string="Profit Percentage", tracking=True, compute="_compute_const")    
@@ -66,34 +57,41 @@ class BoqWorkUnit(models.Model):
         tracking=True,
     )
 
-    boq_const_id = fields.Many2one(
-        comodel_name="boq.const",
-        string="BoQ Const",
-        default=1
+    boq_conf_id = fields.Many2one(
+        comodel_name="boq.conf",
+        string="BoQ Conf",
+        default=lambda self: self.env['boq.conf'].get_conf().id
     )
     
-    @api.depends('materials_price', 'services_price', 'others_price')
+    uom_id = fields.Many2one(
+        comodel_name="uom.uom",
+        string="Unit",
+        tracking=True,
+        required=True
+    )
+
+    @api.depends('material_total', 'service_total', 'others_price')
     def _compute_price_unit(self):
         for line in self:
-            materials_price = line.materials_price or 0.0
-            services_price = line.services_price or 0.0
+            material_total = line.material_total or 0.0
+            service_total = line.service_total or 0.0
             others_price = line.others_price or 0.0
             
             # calculate total price
-            line.price_unit = materials_price + services_price + others_price
+            line.price_unit = material_total + service_total + others_price
     
     @api.depends('material_ids.product_id', 'service_ids.product_id', 'others_ids.product_id',
                  'material_ids.material_price', 'service_ids.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
         for record in self:
-            record.materials_price = sum(line.material_price for line in record.material_ids)
-            record.services_price = sum(line.service_price for line in record.service_ids)
+            record.material_total = sum(line.material_price for line in record.material_ids)
+            record.service_total = sum(line.service_price for line in record.service_ids)
             record.others_price = sum(line.others_price_final for line in record.others_ids)
             
-    # automatically create others data when work_unit_code is set
-    @api.onchange('work_unit_code')
+    # automatically create others data when code is set
+    @api.onchange('code')
     def _onchange_work_unit_code(self):
-        if self.work_unit_code and not self.others_ids:
+        if self.code and not self.others_ids:
             self.others_ids = [
                 Command.create({'others_name': 'Keuntungan'}),
                 Command.create({'others_name': 'Lain-lain'}),
@@ -102,8 +100,8 @@ class BoqWorkUnit(models.Model):
     def action_save(self):
         self.ensure_one()
         self.write({
-            'updated_date': fields.Datetime.now(),
-            'updated_by': self.env.user.name
+            'last_update': fields.Datetime.now(),
+            'modified_by': self.env.user.name
         })
         return {
             'type': 'ir.actions.act_window',
@@ -149,11 +147,13 @@ class BoqWorkUnit(models.Model):
         for record in self:
             record.is_locked = record.state == 'approved'
 
-    @api.depends('boq_const_id')
+    @api.depends('boq_conf_id')
     def _compute_const(self):
         for record in self:
-            if record.boq_const_id:
-                record.profit_percentage = record.boq_const_id.profit_percentage or 0.0
+            if record.boq_conf_id.exists():
+                record.profit_percentage = record.boq_conf_id.profit_percentage or 0.0
+            else:
+                record.profit_percentage = 0.0
 
     def write(self, vals):
         # increment revision count
@@ -172,7 +172,7 @@ class BoqWorkUnit(models.Model):
     def action_duplicate_on_approval(self):
         for record in self:
             existing_duplicate = self.search([
-                ('work_unit_code', '=', record.work_unit_code),
+                ('code', '=', record.code),
                 ('is_duplicate', '=', True),
                 ('state', '=', 'approved'),
             ], limit=1)
@@ -205,8 +205,8 @@ class BoqWorkUnit(models.Model):
                 existing_duplicate.with_context(skipping_duplicate=True).write({
                     'status': record.status,
                     'state': 'approved',
-                    'updated_by': record.updated_by,
-                    'updated_date': record.updated_date
+                    'modified_by': record.modified_by,
+                    'last_update': record.last_update
                 })
             
             else:
@@ -238,7 +238,7 @@ class BoqWorkUnit(models.Model):
         # reverts the current data to its previous approved version by copying/overwite all values
         for record in self:
             previous_version = self.search([
-                ('work_unit_code', '=', record.work_unit_code),
+                ('code', '=', record.code),
                 ('is_duplicate', '=', True),
                 ('state', '=', 'approved')
             ], limit=1)
@@ -292,7 +292,7 @@ class BoqWorkUnit(models.Model):
             if not record.is_duplicate:
                 # Find and delete the duplicate record
                 duplicate = self.search([
-                    ('work_unit_code', '=', record.work_unit_code),
+                    ('code', '=', record.code),
                     ('is_duplicate', '=', True)
                 ])
                 if duplicate:

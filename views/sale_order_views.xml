@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_menu_sale_order_view" model="ir.actions.act_window">
+        <field name="name">BoQ Sale Order</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_boq', '=', True)]</field>
+        <field name="context">{'default_is_boq': True}</field>
+    </record>
+    
+    <record id="sale_order_inherit_form_view" model="ir.ui.view">
+        <field name="name">sale.order.inherit.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="is_boq" invisible="1"/>
+                <field name="boq_id" readonly="1" invisible="1"/>
+                <field name="boq_name" readonly="1" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//button[@id='create_invoice']" position="replace">
+                <button name="%(project.    )d" 
+                        string="Create Project" 
+                        type="action" 
+                        class="btn-primary"
+                        context="{'default_partner_id': partner_id, 'default_name': boq_name}"
+                        invisible= "not is_boq or state not in ['sale']"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -39,7 +39,7 @@ class BoqOthers(models.Model):
                     record.others_base_price = keuntungan_rec.others_base_price
                     continue
             if record.work_unit_id:
-                record.others_base_price = record.work_unit_id.materials_price + record.work_unit_id.services_price
+                record.others_base_price = record.work_unit_id.material_total + record.work_unit_id.service_total
             else:
                 record.others_base_price = 0
 
