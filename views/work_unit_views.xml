@@ -4,6 +4,7 @@
         <field name="name">Satuan Pekerjaan</field>
         <field name="res_model">boq.work_unit</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_duplicate', '=', False)]</field>
     </record>
 
     <!-- tree -->
@@ -16,6 +17,7 @@
                 <field name="name"/>
                 <field name="price_unit" />
                 <field name="state"/>
+                <field name="is_duplicate" invisible="1"/>
             </tree>
         </field>
     </record>

@@ -20,7 +20,7 @@
             </xpath>
 
             <xpath expr="//button[@id='create_invoice']" position="replace">
-                <button name="%(project.    )d" 
+                <button name="%(project.open_create_project)d" 
                         string="Create Project" 
                         type="action" 
                         class="btn-primary"
