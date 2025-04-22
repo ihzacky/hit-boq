@@ -21,7 +21,8 @@ class BoqConf(models.Model):
     # Singleton
     @api.model
     def get_conf(self):
-        conf = self.search([], limit=1)
+        # conf = self.search([], limit=1)
+        conf = self.browse(1)
         if not conf:
             conf = self.create({})
         return conf

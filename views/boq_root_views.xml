@@ -95,7 +95,7 @@
                     </group>
                     
                     <notebook>
-                        <page name="pricing" string="Harga">
+                        <page name="pricing" string="Harga" readonly="1">
 
                             <group string="After Margin">
                                 <group string="Harga Satuan">
