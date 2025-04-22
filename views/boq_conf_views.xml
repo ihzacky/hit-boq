@@ -2,9 +2,10 @@
 <odoo>
 
     <record id="action_menu_boq_conf" model="ir.actions.act_window">
-        <field name="name">BoQ Conf</field>
+        <field name="name">BoQ Configuration</field>
         <field name="res_model">boq.conf</field>
         <field name="view_mode">form</field>
+        <field name="res_id">1</field>
         <field name="target">inline</field>
     </record>
 

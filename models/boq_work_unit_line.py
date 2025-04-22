@@ -111,7 +111,7 @@ class BoqWorkUnitLine(models.Model):
             else:
                 record.override_price = 0
 
-    @api.depends('material_base_price', 'service_base_price', 'others_base_price', 'quantity')
+    @api.depends('quantity', 'material_base_price', 'service_base_price', 'others_base_price')
     def _compute_components_price_final(self):
         for record in self:
             record.material_price_final = record.material_base_price * record.quantity
@@ -123,7 +123,7 @@ class BoqWorkUnitLine(models.Model):
         'material_base_price', 'service_base_price', 
         'boq_root_id.material_margin', 'boq_root_id.installation_margin',
         'work_unit_id.material_total', 'work_unit_id.service_total',
-        'override_price', 'code'
+        'override_price', 'code', 'quantity'
     )
     def _compute_components_price_after_margin(self):
         for record in self:

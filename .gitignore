@@ -1,5 +1,3 @@
 /notes/
-/__pycache__/
-models/__pycache__
-/tests/
-security/
+**/__pycache__/
+*.py[cod]

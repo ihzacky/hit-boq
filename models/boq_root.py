@@ -80,7 +80,9 @@ class BoqRoot(models.Model):
     sale_order_ids = fields.One2many('sale.order', 'boq_id')
 
     sale_order_adapter_ids = fields.One2many(comodel_name='boq.adapter.sale', inverse_name='boq_id')
-    
+
+    sale_order_count = fields.Integer(string='Sale Orders', compute='_compute_sale_order_count')
+
     def write(self, vals):
         vals.update({
             'last_update': fields.Datetime.now(),
@@ -228,3 +230,18 @@ class BoqRoot(models.Model):
         self._compute_maintenance_price()
         
         return True
+
+    def _compute_sale_order_count(self):
+        for record in self:
+            record.sale_order_count = len(record.sale_order_ids)
+
+    def action_view_sale_order(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Sale Orders',
+            'view_mode': 'tree,form',
+            'res_model': 'sale.order',
+            'domain': [('boq_id', '=', self.id)],
+            'context': {'default_boq_id': self.id},
+        }

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_boq_root,access_boq_root,model_boq_root,base.group_user,1,1,1,1
+access_boq_work_unit,access_boq_work_unit,model_boq_work_unit,base.group_user,1,1,1,1
+access_boq_work_unit_line,access_boq_work_unit_line,model_boq_work_unit_line,base.group_user,1,1,1,1
+access_boq_material,access_boq_material,model_boq_material,base.group_user,1,1,1,1
+access_boq_service,access_boq_service,model_boq_service,base.group_user,1,1,1,1
+access_boq_others,access_boq_others,model_boq_others,base.group_user,1,1,1,1
+access_boq_conf,access_boq_conf,model_boq_conf,base.group_user,1,1,1,1
+access_boq_adapter_sale,access_boq_adapter_sale,model_boq_adapter_sale,base.group_user,1,1,1,1

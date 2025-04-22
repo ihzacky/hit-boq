@@ -12,7 +12,6 @@ class BoqAdapterSale(models.TransientModel):
     )
     payment_term_id = fields.Many2one(comodel_name='account.payment.term',
         string="Payment Terms",
-        compute='_compute_payment_term_id',
         store=True, readonly=False, precompute=True, check_company=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"
     )

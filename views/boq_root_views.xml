@@ -45,6 +45,14 @@
                             invisible="0"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-usd">
+                            <field name="sale_order_count" string="Sale Orders" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="boq_code"/>
@@ -87,7 +95,7 @@
                     </group>
                     
                     <notebook>
-                        <page name="pricing" string="Harga">
+                        <page name="pricing" string="Harga" readonly="1">
 
                             <group string="After Margin">
                                 <group string="Harga Satuan">
