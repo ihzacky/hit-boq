@@ -60,7 +60,8 @@ class BoqWorkUnit(models.Model):
     boq_conf_id = fields.Many2one(
         comodel_name="boq.conf",
         string="BoQ Conf",
-        default=lambda self: self.env['boq.conf'].get_conf().id
+        default=lambda self: self.env['boq.conf'].get_conf().id,
+        required=True
     )
     
     uom_id = fields.Many2one(
