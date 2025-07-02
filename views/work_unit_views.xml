@@ -7,6 +7,19 @@
         <field name="domain">[('is_duplicate', '=', False)]</field>
     </record>
 
+    <record id="view_boq_work_unit_search" model="ir.ui.view">
+        <field name="name">boq.work_unit.search</field>
+        <field name="model">boq.work_unit</field>
+        <field name="arch" type="xml">
+            <search string="Search Satuan Pekerjaan">
+                <field name="name" string="Pekerjaan" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+            </search>
+        </field>
+    </record>
+
     <!-- tree -->
     <record id="menu_work_unit_tree" model="ir.ui.view">
         <field name="name">menu.work_unit.tree</field>

@@ -71,6 +71,14 @@ class BoqWorkUnit(models.Model):
         required=True
     )
 
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None, order=None):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('code', operator, name), ('name', operator, name)]
+        return self._search(domain + args, limit=limit, access_rights_uid=name_get_uid, order=order)
+
     @api.depends('material_total', 'service_total', 'others_price')
     def _compute_price_unit(self):
         for line in self:
