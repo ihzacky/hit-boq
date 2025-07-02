@@ -1,9 +1,9 @@
 from odoo import models, fields, api
 from math import ceil
 
-class BoqMaterial(models.Model):
-    _name = 'boq.material'
-    _description = 'BoQ Satuan Pekerjaan - Material'
+class BoqMaterialLine(models.Model):
+    _name = 'boq.material.line'
+    _description = 'BoQ Satuan Pekerjaan - Material Line'
     _inherit = "mail.thread"
     _order = "sequence, id"
 

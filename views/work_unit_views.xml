@@ -89,7 +89,7 @@
                     </group>
 
                     <group class="p-4 mb-4" string="Material">
-                        <field name="material_ids" force_save="1" nolabel="1" colspan="2" readonly="is_locked">
+                        <field name="material_line" force_save="1" nolabel="1" colspan="2" readonly="is_locked">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>
@@ -106,7 +106,7 @@
                     </group>
                     
                     <group class="p-4 mb-4" string="Instalasi">
-                        <field name="service_ids" force_save="1" nolabel="1" colspan="2" readonly="is_locked">
+                        <field name="service_line" force_save="1" nolabel="1" colspan="2" readonly="is_locked">
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id" widget="many2one" options="{'no_create': True}" string="Item"/>

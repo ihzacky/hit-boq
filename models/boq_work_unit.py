@@ -30,11 +30,11 @@ class BoqWorkUnit(models.Model):
 
     price_unit = fields.Monetary(string="Total Harga Pekerjaan", currency_field="currency_id", compute="_compute_price_unit",  tracking=True, store=True)
     
-    material_ids = fields.One2many(comodel_name='boq.material', inverse_name="work_unit_id", string='Satuan Pekerjaan - Material')
+    material_line = fields.One2many(comodel_name='boq.material.line', inverse_name="work_unit_id", string='Satuan Pekerjaan - Material')
     material_total = fields.Monetary(string="Harga Material", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
     material_notes = fields.Text(string="Material Note  ")
 
-    service_ids = fields.One2many(comodel_name='boq.service', inverse_name="work_unit_id", string='Satuan Pekerjaan - Jasa')
+    service_line = fields.One2many(comodel_name='boq.service.line', inverse_name="work_unit_id", string='Satuan Pekerjaan - Jasa')
     service_total = fields.Monetary(string="Harga Instalasi", currency_field="currency_id", compute="_compute_component_prices", tracking=True, store=True)
     service_notes = fields.Text(string="Services Note")
 
@@ -89,12 +89,12 @@ class BoqWorkUnit(models.Model):
             # calculate total price
             line.price_unit = material_total + service_total + others_price
     
-    @api.depends('material_ids.product_id', 'service_ids.product_id', 'others_ids.product_id',
-                 'material_ids.material_price', 'service_ids.service_price', 'others_ids.others_price_final')
+    @api.depends('material_line.product_id', 'service_line.product_id', 'others_ids.product_id',
+                 'material_line.material_price', 'service_line.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
         for record in self:
-            record.material_total = sum(line.material_price for line in record.material_ids)
-            record.service_total = sum(line.service_price for line in record.service_ids)
+            record.material_total = sum(line.material_price for line in record.material_line)
+            record.service_total = sum(line.service_price for line in record.service_line)
             record.others_price = sum(line.others_price_final for line in record.others_ids)
             
     # automatically create others data when code is set
@@ -177,7 +177,7 @@ class BoqWorkUnit(models.Model):
         return super().write(vals)
 
     # creates a duplicate record with the same components and marked as a duplicate
-    @api.depends('material_ids', 'service_ids', 'others_ids')
+    @api.depends('material_line', 'service_line', 'others_ids')
     def action_duplicate_on_approval(self):
         for record in self:
             existing_duplicate = self.search([
@@ -188,18 +188,18 @@ class BoqWorkUnit(models.Model):
             
             if existing_duplicate:
                 # Clear existing records in duplicate
-                existing_duplicate.material_ids.unlink()
-                existing_duplicate.service_ids.unlink()
+                existing_duplicate.material_line.unlink()
+                existing_duplicate.service_line.unlink()
                 existing_duplicate.others_ids.unlink()
                 
                 # Create new copies for materials
-                for material in record.material_ids:
+                for material in record.material_line:
                     material.copy({
                         'work_unit_id': existing_duplicate.id
                     })
                 
                 # Create new copies for services
-                for service in record.service_ids:
+                for service in record.service_line:
                     service.copy({
                         'work_unit_id': existing_duplicate.id
                     })
@@ -226,13 +226,13 @@ class BoqWorkUnit(models.Model):
                 })
                 
                 # Copy materials
-                for material in record.material_ids:
+                for material in record.material_line:
                     material.copy({
                         'work_unit_id': duplicated_record.id
                     })
                 
                 # Copy services
-                for service in record.service_ids:
+                for service in record.service_line:
                     service.copy({
                         'work_unit_id': duplicated_record.id
                     })
@@ -254,7 +254,7 @@ class BoqWorkUnit(models.Model):
             
             if previous_version:              
                 materials_to_create = []
-                for material in previous_version.material_ids:
+                for material in previous_version.material_line:
                     materials_to_create.append({
                         'work_unit_id': record.id,
                         'product_id': material.product_id.id,
@@ -263,7 +263,7 @@ class BoqWorkUnit(models.Model):
                     })
                 
                 services_to_create = []
-                for service in previous_version.service_ids:
+                for service in previous_version.service_line:
                     services_to_create.append({
                         'work_unit_id': record.id,
                         'product_id': service.product_id.id,
@@ -278,18 +278,18 @@ class BoqWorkUnit(models.Model):
                         'others_base_price': other.others_base_price,
                     })
                 
-                if record.material_ids:
-                    record.material_ids.unlink()
-                if record.service_ids:
-                    record.service_ids.unlink()
+                if record.material_line:
+                    record.material_line.unlink()
+                if record.service_line:
+                    record.service_line.unlink()
                 if record.others_ids:
                     record.others_ids.unlink()
                 
                 # Create new records
                 for vals in materials_to_create:
-                    self.env['boq.material'].create(vals)
+                    self.env['boq.material.line'].create(vals)
                 for vals in services_to_create:
-                    self.env['boq.service'].create(vals)
+                    self.env['boq.service.line'].create(vals)
                 for vals in others_to_create:
                     self.env['boq.others'].create(vals)
 
