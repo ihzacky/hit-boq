@@ -86,19 +86,23 @@
 
                         <field name="material_margin_base" string="Satuan Material (Margin)" optional="show" widget="monetary"/>
                         <field name="service_margin_base" string="Satuan Instalasi (Margin)" optional="show" widget="monetary"/>
-                        <field name="material_margin_final" string="Harga Material (Margin)" sum="Total" widget="monetary"/>
-                        <field name="service_margin_final" string="Harga Instalasi (Margin)" sum="Total" widget="monetary"/>
+                        <field name="material_margin_final" string="Harga Material (Margin)" optional="show" widget="monetary"/>
+                        <field name="service_margin_final" string="Harga Instalasi (Margin)" optional="show" widget="monetary"/>
+                        
+                        <field name="others_base_price" string="Satuan Lain-Lain (Margin)" optional="show" widget="monetary"/>
+                        <field name="others_price_final" string="Harga Lain-Lain (Margin)" optional="show" widget="monetary"/>
 
                         <field name="material_base_price" string="Satuan Material" optional="show" widget="monetary"/>
                         <field name="service_base_price" string="Satuan Instalasi" optional="show" widget="monetary"/>
-                        <field name="material_price_final" string="Harga Material" sum="Total" widget="monetary"/>
-                        <field name="service_price_final" string="Harga Instalasi" sum="Total" widget="monetary"/>
+                        <field name="material_price_final" string="Harga Material" optional="show" widget="monetary"/>
+                        <field name="service_price_final" string="Harga Instalasi" optional="show" widget="monetary"/>
 
                         <field name="others_base_price" string="Satuan Lain-Lain" optional="show" widget="monetary"/>
-                        <field name="others_price_final" string="Harga Lain-Lain" sum="Total" widget="monetary"/>
-                        <field name="override_price" optional="show" widget="monetary"/>
-                        <field name="final_price" string="Total Price" column_invisible="1" widget="monetary"/>
+                        <field name="others_price_final" string="Harga Lain-Lain" optional="show" widget="monetary"/>
 
+                        <field name="override_price" optional="hide" widget="monetary"/>
+                        
+                        <field name="final_price" string="Total Price" column_invisible="1" widget="monetary"/>
                         <field name="display_type" column_invisible="1"/>
                     </tree>
                 </field>
