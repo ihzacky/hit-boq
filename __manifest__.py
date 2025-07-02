@@ -33,6 +33,11 @@
         "report/boq_root_report.xml",
         "views/menu_boq_views.xml",
     ],
+    'assets': {
+        'web.assets_backend': [
+            'hit_boq/static/src/css/boq_views.css',
+        ],
+    },
     "license": "AGPL-3",
     "installable": True,
     "application": True,
