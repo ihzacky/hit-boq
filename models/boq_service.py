@@ -1,8 +1,8 @@
 from odoo import models, fields, api
 from math import ceil
 
-class BoqService(models.Model):
-    _name = 'boq.service'
+class BoqServiceLine(models.Model):
+    _name = 'boq.service.line'
     _description = 'BoQ Satuan Pekerjaan - Jasa'
     _order = "sequence, id"
     _inherit = "mail.thread"
