@@ -54,7 +54,7 @@
                 </div>
                 <div class="oe_title">
                     <h1>
-                        <field name="boq_code" placeholder="e.g. BoQ/2025/001"/>
+                        <field name="boq_code"/>
                     </h1>
                 </div>
                 <group>

@@ -10,7 +10,7 @@ class BoqRoot(models.Model):
     boq_code = fields.Char(string='Kode BoQ')
     boq_name = fields.Char(string='Nama')
     
-    last_update = fields.Datetime(string="Updated Date") 
+    last_update = fields.Char(string="Updated Date") 
     modified_by = fields.Char(string="Updated By")
     
     material_margin = fields.Float(string='Material Margin', compute="_compute_const", store=True)
@@ -85,7 +85,7 @@ class BoqRoot(models.Model):
 
     def write(self, vals):
         vals.update({
-            'last_update': fields.Datetime.now(),
+            'last_update': fields.Datetime.now().strftime('%d-%b-%y'),
             'modified_by': self.env.user.name,
         })
         return super(BoqRoot, self).write(vals)

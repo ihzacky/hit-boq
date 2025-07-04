@@ -15,7 +15,6 @@
     ],
     "data": [
 
-        "security/security.xml",
         "security/ir.model.access.csv",
         
         "data/product_tag_data.xml",

@@ -42,7 +42,7 @@
         <field name="arch" type="xml">
             <form string="BoQ Form">
                 <header>
-                    <button string="Save" type="object" name="action_save" class="btn-primary"/>
+                    <!-- <button string="Save" type="object" name="action_save" class="btn-primary"/> -->
 
                     <!-- Buttons for 'Draft' State -->
                     <button name="action_state_waiting" string="Submit for Approval" type="object"
@@ -83,7 +83,7 @@
                             <field name="status" readonly="1"/>
                             <field name="is_locked" readonly="1" invisible="1"/>
                             <field name="revision_count" readonly="1" invisible="1"/>
-                            <field name="last_update" widget="datetime" readonly="1"/>
+                            <field name="last_update" readonly="1"/>
                             <field name="modified_by" readonly="1"/>
                         </group>
                     </group>

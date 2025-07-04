@@ -15,7 +15,7 @@ class BoqWorkUnit(models.Model):
     code = fields.Char(string='Kode Pekerjaan')
     name = fields.Char(string='Nama Pekerjaan')
     
-    last_update = fields.Datetime(string="Updated Date") 
+    last_update = fields.Char(string="Updated Date") 
     modified_by = fields.Char(string="Updated By")
     
     state = fields.Selection([
@@ -71,6 +71,24 @@ class BoqWorkUnit(models.Model):
         required=True
     )
 
+    def write(self, vals):
+        # increment revision count
+        if 'state' in vals:
+            if vals['state'] == 'draft' and self.state in ['approved', 'rejected']:
+                vals['revision_count'] = self.revision_count + 1
+                
+        # create duplicate when record is approved
+        if vals.get('state') == 'approved' and not self.env.context.get('skipping_duplicate'):
+            self.with_context(skipping_duplicate=True).action_duplicate_on_approval()
+                
+        vals.update({
+            # 'last_update': fields.Datetime.now().strftime('%d-%b-%y'),
+            'last_update': fields.Datetime.now(),
+            'modified_by': self.env.user.name
+        })
+
+        return super().write(vals)
+
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None, order=None):
         args = args or []
@@ -105,20 +123,6 @@ class BoqWorkUnit(models.Model):
                 Command.create({'others_name': 'Keuntungan'}),
                 Command.create({'others_name': 'Lain-lain'}),
             ]
-
-    def action_save(self):
-        self.ensure_one()
-        self.write({
-            'last_update': fields.Datetime.now(),
-            'modified_by': self.env.user.name
-        })
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'main',
-        }
 
     def action_state_waiting(self):
         self.ensure_one()
@@ -163,18 +167,6 @@ class BoqWorkUnit(models.Model):
                 record.profit_percentage = record.boq_conf_id.profit_percentage or 0.0
             else:
                 record.profit_percentage = 0.0
-
-    def write(self, vals):
-        # increment revision count
-        if 'state' in vals:
-            if vals['state'] == 'draft' and self.state in ['approved', 'rejected']:
-                vals['revision_count'] = self.revision_count + 1
-                
-        # create duplicate when record is approved
-        if vals.get('state') == 'approved' and not self.env.context.get('skipping_duplicate'):
-            self.with_context(skipping_duplicate=True).action_duplicate_on_approval()
-                
-        return super().write(vals)
 
     # creates a duplicate record with the same components and marked as a duplicate
     @api.depends('material_line', 'service_line', 'others_ids')
