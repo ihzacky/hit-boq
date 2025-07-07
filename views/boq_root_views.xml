@@ -21,7 +21,7 @@
 
     <!-- form -->
     <record id="menu_boq_form" model="ir.ui.view">
-    <field name="name">menu.boq.form.redesigned</field>
+    <field name="name">menu.boq.form</field>
     <field name="model">boq.root</field>
     <field name="arch" type="xml">
         <form string="BoQ Form" class="o_form_view_full_width">
@@ -41,7 +41,8 @@
                 <button name="action_recompute_all_prices"
                         string="Recompute Prices"
                         type="object"
-                        class="btn-secondary"/>
+                        class="btn-secondary"
+                        gorups="base.group_system"/>
             </header>
             <sheet>
                 <div class="oe_button_box" name="button_box">
@@ -69,43 +70,44 @@
                         <field name="installation_margin"/>
                     </group>
                 </group>
+                <group string="Pekerjaan">    
+                    <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many">
+                        <tree editable="bottom">
+                            <control>
+                                <create name="add_product_control" string="Add a product"/>
+                                <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                            </control>
 
-                <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many">
-                    <tree editable="bottom">
-                        <control>
-                            <create name="add_product_control" string="Add a product"/>
-                            <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
-                            <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
-                        </control>
+                            <field name="sequence" widget="handle"/>
+                            <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
+                            <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" readonly="False"/>
+                            <field name="quantity" string="Qty" required="not display_type"/>
+                            <field name="work_unit_line_uom" string="Unit" required="not display_type"/>
 
-                        <field name="sequence" widget="handle"/>
-                        <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type" force_save="1"/>
-                        <field name="name" string="Nama Pekerjaan" widget="section_and_note_text"/>
-                        <field name="quantity" string="Qty" required="not display_type"/>
-                        <field name="work_unit_line_uom" string="Unit" required="not display_type"/>
+                            <field name="material_margin_base" string="Satuan Material (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_margin_base" string="Satuan Instalasi (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="material_margin_final" string="Harga Material (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_margin_final" string="Harga Instalasi (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            
+                            <field name="others_base_price" string="Satuan Lain-Lain (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="others_price_final" string="Harga Lain-Lain (Margin)" optional="show" widget="monetary" required="not display_type"/>
 
-                        <field name="material_margin_base" string="Satuan Material (Margin)" optional="show" widget="monetary"/>
-                        <field name="service_margin_base" string="Satuan Instalasi (Margin)" optional="show" widget="monetary"/>
-                        <field name="material_margin_final" string="Harga Material (Margin)" optional="show" widget="monetary"/>
-                        <field name="service_margin_final" string="Harga Instalasi (Margin)" optional="show" widget="monetary"/>
-                        
-                        <field name="others_base_price" string="Satuan Lain-Lain (Margin)" optional="show" widget="monetary"/>
-                        <field name="others_price_final" string="Harga Lain-Lain (Margin)" optional="show" widget="monetary"/>
+                            <field name="material_base_price" string="Satuan Material" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_base_price" string="Satuan Instalasi" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="material_price_final" string="Harga Material" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_price_final" string="Harga Instalasi" optional="show" widget="monetary" required="not display_type"/>
 
-                        <field name="material_base_price" string="Satuan Material" optional="show" widget="monetary"/>
-                        <field name="service_base_price" string="Satuan Instalasi" optional="show" widget="monetary"/>
-                        <field name="material_price_final" string="Harga Material" optional="show" widget="monetary"/>
-                        <field name="service_price_final" string="Harga Instalasi" optional="show" widget="monetary"/>
+                            <field name="others_base_price" string="Satuan Lain-Lain" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="others_price_final" string="Harga Lain-Lain" optional="show" widget="monetary" required="not display_type"/>
 
-                        <field name="others_base_price" string="Satuan Lain-Lain" optional="show" widget="monetary"/>
-                        <field name="others_price_final" string="Harga Lain-Lain" optional="show" widget="monetary"/>
-
-                        <field name="override_price" optional="hide" widget="monetary"/>
-                        
-                        <field name="final_price" string="Total Price" column_invisible="1" widget="monetary"/>
-                        <field name="display_type" column_invisible="1"/>
-                    </tree>
-                </field>
+                            <field name="override_price" optional="hide" widget="monetary" required="not display_type"/>
+                            
+                            <field name="final_price" string="Total Price" column_invisible="1" widget="monetary" required="not display_type"/>
+                            <field name="display_type" column_invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
 
                 <group class="mt-4">
                     <group string="Totals (Before Margin)">

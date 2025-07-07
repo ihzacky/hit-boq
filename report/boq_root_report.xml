@@ -227,12 +227,15 @@
                                         <t t-foreach="doc.work_unit_line_ids" t-as="next_line">
                                             <t t-if="(next_line.sequence - line.sequence == 1) and next_line.display_type == 'line_note' and (next_line.id not in printed_notes)">
                                                 <tr>
-                                                    <td colspan="2"></td>
-                                                    <td colspan="9">
-                                                        <span t-field="next_line.name"/>
+                                                    <td colspan="2" style="border: 1px solid black;"></td>
+                                                    <td colspan="9" style="white-space: pre-line; border: 1px solid black" name="td_note_line">
+                                                        <span t-field="line.name"/>
                                                     </td>
-                                                    <td style="border-top-style: none; border-bottom-style: none;"></td>
-                                                    <td colspan="6" style="background-color: white"></td>
+                                                    <!-- Separator column -->
+	                                                <td style="border-top: none; border-bottom: none;"></td>
+                                                    <!-- <td style="border-top-style: none; border-bottom-style: none;"></td> -->
+                                                    <!-- <td colspan="6" style="background-color: white"></td> -->
+                                                    <td colspan="6" style="background-color: white; border: 1px solid black"></td>
                                                 </tr>
                                                 <t t-set="printed_notes" t-value="printed_notes + [next_line.id]"/>
                                             </t>

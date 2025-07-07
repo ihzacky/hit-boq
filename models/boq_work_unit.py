@@ -107,8 +107,7 @@ class BoqWorkUnit(models.Model):
             # calculate total price
             line.price_unit = material_total + service_total + others_price
     
-    @api.depends('material_line.product_id', 'service_line.product_id', 'others_ids.product_id',
-                 'material_line.material_price', 'service_line.service_price', 'others_ids.others_price_final')
+    @api.depends('material_line.material_price', 'service_line.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
         for record in self:
             record.material_total = sum(line.material_price for line in record.material_line)

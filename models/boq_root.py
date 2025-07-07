@@ -34,7 +34,7 @@ class BoqRoot(models.Model):
     maintenance_others_final = fields.Monetary(currency_field="currency_id", compute="_compute_maintenance_price", store=True)
     maintenance_final = fields.Monetary(string="Total Harga Maintenance sesudah margin", currency_field="currency_id", compute="_compute_maintenance_price", store=True)
     
-    price_final = fields.Monetary(string="Total Seluruh Harga sesudah margin", currency_field="currency_id", compute="_compute_boq_price", store=True)
+    price_final = fields.Monetary(string="Final Price", currency_field="currency_id", compute="_compute_boq_price", store=True)
 
     notes_general = fields.Html(string="BoQ Notes")
     notes_exclude = fields.Html(string="Exclude Notes")
@@ -50,18 +50,6 @@ class BoqRoot(models.Model):
         inverse_name='boq_root_id',
         string='Work Unit Lines',
         domain=[('is_duplicate', '=', False)]
-    )
-
-    work_unit_line_before_margin_ids = fields.One2many(
-        comodel_name='boq.work_unit.line',
-        string='Work Unit Lines Before Margin',
-        compute='_compute_work_unit_line_before_margin_ids'
-    )
-
-    work_unit_line_after_margin_ids = fields.One2many(
-        comodel_name='boq.work_unit.line',
-        string='Work Unit Lines After Margin',
-        compute='_compute_work_unit_line_after_margin_ids'
     )
 
     currency_id = fields.Many2one(
@@ -111,13 +99,11 @@ class BoqRoot(models.Model):
 
 
     @api.depends(
-        'work_unit_line_ids',
         'work_unit_line_ids.material_price_final',
         'work_unit_line_ids.service_price_final',
         'work_unit_line_ids.others_price_final',
         'work_unit_line_ids.material_margin_final',
-        'work_unit_line_ids.service_margin_final',
-        'work_unit_line_ids.code',
+        'work_unit_line_ids.service_margin_final'
     )
     def _compute_boq_price(self):
         for record in self:
@@ -139,7 +125,7 @@ class BoqRoot(models.Model):
         'work_unit_line_ids.service_price_final', 
         'work_unit_line_ids.others_price_final',
         'work_unit_line_ids.service_margin_final',
-        'work_unit_line_ids.code'  # Add this dependency
+        'work_unit_line_ids.code'
     )
     def _compute_maintenance_price(self):
         for record in self:
@@ -179,13 +165,6 @@ class BoqRoot(models.Model):
                 record.material_margin, record.installation_margin = 0.0
 
     @api.depends('work_unit_line_ids')
-    def _compute_work_unit_line_before_margin_ids(self):
-        for record in self:
-            record.work_unit_line_before_margin_ids = record.work_unit_line_ids.filtered(
-                lambda line: not line.display_type
-            )
-
-    @api.depends('work_unit_line_ids')
     def _compute_work_unit_line_after_margin_ids(self):
         for record in self:
             record.work_unit_line_after_margin_ids = record.work_unit_line_ids.filtered(
@@ -220,6 +199,7 @@ class BoqRoot(models.Model):
         self.ensure_one()
         # Recompute work unit lines
         for line in self.work_unit_line_ids:
+            line._get_work_unit_components()
             line._get_base_price()
             line._compute_components_price_final()
             line._compute_components_price_after_margin()
