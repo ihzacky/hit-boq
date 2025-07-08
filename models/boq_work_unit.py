@@ -71,6 +71,14 @@ class BoqWorkUnit(models.Model):
         required=True
     )
 
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        required=True,
+        readonly=True
+    )
+
     def write(self, vals):
         # increment revision count
         if 'state' in vals:
@@ -123,21 +131,21 @@ class BoqWorkUnit(models.Model):
                 Command.create({'others_name': 'Lain-lain'}),
             ]
 
-    def action_state_waiting(self):
-        self.ensure_one()
-        self.write({'state': 'waiting'})
+    # def action_state_waiting(self):
+    #     self.ensure_one()
+    #     self.write({'state': 'waiting'})
 
-    def action_state_approved(self):
-        self.ensure_one()
-        self.write({'state': 'approved'})
+    # def action_state_approved(self):
+    #     self.ensure_one()
+    #     self.write({'state': 'approved'})
 
-    def action_state_rejected(self):
-        self.ensure_one()
-        self.write({'state': 'rejected'})
+    # def action_state_rejected(self):
+    #     self.ensure_one()
+    #     self.write({'state': 'rejected'})
 
-    def action_send_to_revision(self):
-        self.ensure_one()
-        self.write({'state': 'draft'})
+    # def action_send_to_revision(self):
+    #     self.ensure_one()
+    #     self.write({'state': 'draft'})
 
     @api.depends('state', 'revision_count')
     def _compute_status(self):

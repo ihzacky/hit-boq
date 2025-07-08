@@ -12,6 +12,8 @@
         "mail", 
         "sale", 
         "project",
+        "ssi_multiple_approval_mixin",
+        "winprof_approval",
     ],
     "data": [
 
@@ -29,6 +31,7 @@
         "views/boq_conf_views.xml",
         "views/boq_root_views.xml",
         "views/work_unit_views.xml",
+        "views/work_unit_approval_views.xml",
         "report/boq_root_report.xml",
         "views/menu_boq_views.xml",
     ],
