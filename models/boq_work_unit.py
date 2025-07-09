@@ -20,7 +20,7 @@ class BoqWorkUnit(models.Model):
     
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('waiting', 'Waiting for Confirmation'),
+        ('to_approve', 'Waiting for Confirmation'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
     ], string="State", default='draft', readonly=True, tracking=True)
@@ -131,28 +131,12 @@ class BoqWorkUnit(models.Model):
                 Command.create({'others_name': 'Lain-lain'}),
             ]
 
-    # def action_state_waiting(self):
-    #     self.ensure_one()
-    #     self.write({'state': 'waiting'})
-
-    # def action_state_approved(self):
-    #     self.ensure_one()
-    #     self.write({'state': 'approved'})
-
-    # def action_state_rejected(self):
-    #     self.ensure_one()
-    #     self.write({'state': 'rejected'})
-
-    # def action_send_to_revision(self):
-    #     self.ensure_one()
-    #     self.write({'state': 'draft'})
-
     @api.depends('state', 'revision_count')
     def _compute_status(self):
         for record in self:
             base_status = {
                 'draft': 'Draft',
-                'waiting': 'Waiting for Confirmation',
+                'to_approve': 'Waiting for Confirmation',
                 'approved': 'Approved',
                 'rejected': 'Rejected'
             }.get(record.state, '')

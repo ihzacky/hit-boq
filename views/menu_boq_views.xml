@@ -67,21 +67,27 @@
         <!-- BoQ Sale Order -->
         
         <menuitem
-            id="menu_boq_sale_order"
-            name="Sale Order"
-            action="action_menu_sale_order_view"
+            id="menu_boq_order"
+            name="Order"
             parent="menu_boq"
             sequence="13"
         />
 
-
-        <!-- <menuitem
-            id="menu_boq_project"
-            name="BoQ Project"
-            action="action_menu_project"
-            parent="menu_boq"
-            sequence="13"
-        /> -->
+        <menuitem
+            id="menu_boq_quotation"
+            name="Quotation"
+            action="action_menu_quotation_view"
+            parent="menu_boq_order"
+            sequence="14"
+        />
+        
+        <menuitem
+            id="menu_boq_sale_order"
+            name="Sale Order"
+            action="action_menu_sale_order_view"
+            parent="menu_boq_order"
+            sequence="15"
+        />
 
     </data>
 </odoo>

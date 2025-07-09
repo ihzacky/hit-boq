@@ -19,17 +19,18 @@ class BoqWorkUnitApproval(models.Model):
         self.show_button_approve = False
         self.show_button_approve = self.release_strategy_ids.get_show_button(self._name, self.id, "to_approve")
 
+    def set_draft(self):
+        return self.write({"state": "draft"})
+
+    def set_to_approve(self):
+        return self.write({"state": "to_approve"})
+    
     def set_approved(self):
         return self.write({"state": "approved"})
 
     def set_rejected(self):
         return self.write({"state": "rejected"})
 
-    def set_draft(self):
-        return self.write({"state": "draft"})
-
-    def set_to_approve(self):
-        return self.write({"state": "to_approve"})
 
     # -------------------------------------------------------------
     
