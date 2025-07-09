@@ -22,14 +22,14 @@
                 <button name="button_to_reject" 
                         string="Reject" 
                         type="object"
-                        data-confirm="Are you sure?"
+                        confirm="Are you sure?"
                         class="btn-danger"
                         invisible="not show_button_approve" 
                 />
                 <button name="button_to_revision" 
                         string="Send to Revision" 
                         type="object" 
-                        data-confirm="Are you sure?"
+                        confirm="Are you sure?"
                         class="btn-secondary"
                         invisible="state not in ['approved', 'rejected']" 
                 />

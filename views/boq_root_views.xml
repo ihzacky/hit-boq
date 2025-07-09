@@ -27,7 +27,7 @@
         <form string="BoQ Form" class="o_form_view_full_width">
             <header>
                 <button name="%(hit_boq.action_view_boq_adapter_sale)d"
-                        string="Create Sale Order"
+                        string="Create Quotation"
                         type="action"
                         class="btn-primary"
                         context="{'default_boq_id': active_id}"/>
@@ -50,7 +50,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-usd">
-                        <field name="sale_order_count" string="Sale Orders" widget="statinfo"/>
+                        <field name="sale_order_count" string="Orders" widget="statinfo"/>
                     </button>
                 </div>
                 <div class="oe_title">

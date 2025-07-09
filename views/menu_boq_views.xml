@@ -47,12 +47,18 @@
             parent="menu_work_unit"
             sequence="10"
         />
+        
+        <menuitem
+            id="separator_work_unit"
+            name="Pekerjaan"
+            parent="menu_work_unit"
+        />
 
         <menuitem
             id="menu_work_unit_material"
             name="Material"
             action="action_menu_material_products"
-            parent="menu_work_unit"
+            parent="separator_work_unit"
             sequence="11"
         />
         
@@ -60,7 +66,7 @@
             id="menu_work_unit_service"
             name="Jasa"
             action="action_menu_service_products"
-            parent="menu_work_unit"
+            parent="separator_work_unit"
             sequence="12"
         />
 
