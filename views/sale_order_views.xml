@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="action_menu_quotation_view" model="ir.actions.act_window">
+        <field name="name">BoQ Quotation</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_boq', '=', True), ('state', '=', 'draft')]</field>
+        <field name="context">{'default_is_boq': True}</field>
+    </record>
+    
     <record id="action_menu_sale_order_view" model="ir.actions.act_window">
         <field name="name">BoQ Sale Order</field>
         <field name="res_model">sale.order</field>

@@ -1,0 +1,9 @@
+/* File: hit_boq/static/src/css/boq_views.css */
+
+/*
+  This CSS rule targets forms with our custom class
+  and removes the maximum width constraint from the sheet background.
+*/
+.o_form_view.o_form_view_full_width .o_form_sheet_bg {
+    max-width: none;
+}

@@ -1,5 +1,7 @@
 from odoo import models, fields, api 
 from odoo.fields import Command
+import logging
+_logger = logging.getLogger(__name__)
 
 class BoqWorkUnit(models.Model):
     _name = 'boq.work_unit'
@@ -15,12 +17,12 @@ class BoqWorkUnit(models.Model):
     code = fields.Char(string='Kode Pekerjaan')
     name = fields.Char(string='Nama Pekerjaan')
     
-    last_update = fields.Datetime(string="Updated Date") 
+    last_update = fields.Char(string="Updated Date") 
     modified_by = fields.Char(string="Updated By")
     
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('waiting', 'Waiting for Confirmation'),
+        ('to_approve', 'Waiting for Confirmation'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
     ], string="State", default='draft', readonly=True, tracking=True)
@@ -52,7 +54,7 @@ class BoqWorkUnit(models.Model):
 
     work_unit_line_ids = fields.One2many(
         comodel_name='boq.work_unit.line',
-        inverse_name='work_unit_id',
+        inverse_name    ='work_unit_id',
         string='BOQ Work Unit Lines',
         tracking=True,
     )
@@ -70,6 +72,32 @@ class BoqWorkUnit(models.Model):
         tracking=True,
         required=True
     )
+
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        required=True,
+        readonly=True
+    )
+
+    def write(self, vals):
+        # increment revision count
+        if 'state' in vals:
+            if vals['state'] == 'draft' and self.state in ['approved', 'rejected']:
+                vals['revision_count'] = self.revision_count + 1
+                
+        # create duplicate when record is approved
+        if vals.get('state') == 'approved' and not self.env.context.get('skipping_duplicate'):
+            self.with_context(skipping_duplicate=True).action_duplicate_on_approval()
+                
+        vals.update({
+            # 'last_update': fields.Datetime.now().strftime('%d-%b-%y'),
+            'last_update': fields.Datetime.now(),
+            'modified_by': self.env.user.name
+        })
+
+        return super().write(vals)
 
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None, order=None):
@@ -89,8 +117,7 @@ class BoqWorkUnit(models.Model):
             # calculate total price
             line.price_unit = material_total + service_total + others_price
     
-    @api.depends('material_line.product_id', 'service_line.product_id', 'others_ids.product_id',
-                 'material_line.material_price', 'service_line.service_price', 'others_ids.others_price_final')
+    @api.depends('material_line.material_price', 'service_line.service_price', 'others_ids.others_price_final')
     def _compute_component_prices(self):
         for record in self:
             record.material_total = sum(line.material_price for line in record.material_line)
@@ -104,44 +131,14 @@ class BoqWorkUnit(models.Model):
             self.others_ids = [
                 Command.create({'others_name': 'Keuntungan'}),
                 Command.create({'others_name': 'Lain-lain'}),
-            ]
-
-    def action_save(self):
-        self.ensure_one()
-        self.write({
-            'last_update': fields.Datetime.now(),
-            'modified_by': self.env.user.name
-        })
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'main',
-        }
-
-    def action_state_waiting(self):
-        self.ensure_one()
-        self.write({'state': 'waiting'})
-
-    def action_state_approved(self):
-        self.ensure_one()
-        self.write({'state': 'approved'})
-
-    def action_state_rejected(self):
-        self.ensure_one()
-        self.write({'state': 'rejected'})
-
-    def action_send_to_revision(self):
-        self.ensure_one()
-        self.write({'state': 'draft'})
+            ]   
 
     @api.depends('state', 'revision_count')
     def _compute_status(self):
         for record in self:
             base_status = {
                 'draft': 'Draft',
-                'waiting': 'Waiting for Confirmation',
+                'to_approve': 'Waiting for Confirmation',
                 'approved': 'Approved',
                 'rejected': 'Rejected'
             }.get(record.state, '')
@@ -164,18 +161,6 @@ class BoqWorkUnit(models.Model):
             else:
                 record.profit_percentage = 0.0
 
-    def write(self, vals):
-        # increment revision count
-        if 'state' in vals:
-            if vals['state'] == 'draft' and self.state in ['approved', 'rejected']:
-                vals['revision_count'] = self.revision_count + 1
-                
-        # create duplicate when record is approved
-        if vals.get('state') == 'approved' and not self.env.context.get('skipping_duplicate'):
-            self.with_context(skipping_duplicate=True).action_duplicate_on_approval()
-                
-        return super().write(vals)
-
     # creates a duplicate record with the same components and marked as a duplicate
     @api.depends('material_line', 'service_line', 'others_ids')
     def action_duplicate_on_approval(self):
@@ -183,7 +168,7 @@ class BoqWorkUnit(models.Model):
             existing_duplicate = self.search([
                 ('code', '=', record.code),
                 ('is_duplicate', '=', True),
-                ('state', '=', 'approved'),
+                ('state', 'ilike', 'approved'),
             ], limit=1)
             
             if existing_duplicate:
@@ -214,15 +199,19 @@ class BoqWorkUnit(models.Model):
                 existing_duplicate.with_context(skipping_duplicate=True).write({
                     'status': record.status,
                     'state': 'approved',
+                    'status': record.status,
                     'modified_by': record.modified_by,
-                    'last_update': record.last_update
+                    'last_update': record.last_update,
+                    'revision_count': record.revision_count
                 })
             
             else:
                 # Create new duplicate record
                 duplicated_record = record.copy({
                     'is_duplicate': True,
-                    'state': 'approved'
+                    'state': 'approved',
+                    'status': record.status,
+                    'revision_count': record.revision_count
                 })
                 
                 # Copy materials
@@ -252,7 +241,10 @@ class BoqWorkUnit(models.Model):
                 ('state', '=', 'approved')
             ], limit=1)
             
-            if previous_version:              
+            if previous_version:
+                _logger.debug(f"Reverting {record.code} to previous version {previous_version.id}")              
+                
+                # Copy all material, service, and others lines from previous version
                 materials_to_create = []
                 for material in previous_version.material_line:
                     materials_to_create.append({
@@ -278,6 +270,7 @@ class BoqWorkUnit(models.Model):
                         'others_base_price': other.others_base_price,
                     })
                 
+                # Unlink existing lines
                 if record.material_line:
                     record.material_line.unlink()
                 if record.service_line:
@@ -285,15 +278,24 @@ class BoqWorkUnit(models.Model):
                 if record.others_ids:
                     record.others_ids.unlink()
                 
-                # Create new records
+                # Link new lines
                 for vals in materials_to_create:
                     self.env['boq.material.line'].create(vals)
                 for vals in services_to_create:
                     self.env['boq.service.line'].create(vals)
                 for vals in others_to_create:
                     self.env['boq.others'].create(vals)
-
                 
+                # Update fields value with previous version
+                record.write({
+                    'name': previous_version.name,
+                    'state': previous_version.state,
+                    'status': previous_version.status,
+                    'last_update': previous_version.last_update,
+                    'modified_by': previous_version.modified_by,
+                    'revision_count': previous_version.revision_count
+                })
+
                 return True
 
     def unlink(self):

@@ -21,163 +21,125 @@
 
     <!-- form -->
     <record id="menu_boq_form" model="ir.ui.view">
-        <field name="name">menu.boq.form</field>
-        <field name="model">boq.root</field>
-        <field name="arch" type="xml">
-            <form string="BoQ Form">
-                <header>
-                    <button name="%(hit_boq.action_view_boq_adapter_sale)d" 
-                            string="Create Sale Order"
-                            type="action"
-                            class="btn-primary"
-                            context="{'default_boq_id': active_id}"/>
-                    <button string="Print Report" 
-                            type="object" 
-                            class="btn-secondary" 
-                            name="action_print_report"/>
-                    <button name="preview_pdf"
-                            string="Print Preview"
-                            type="object"/>
-                    <button name="action_recompute_all_prices"
-                            string="Recompute Prices"
+    <field name="name">menu.boq.form</field>
+    <field name="model">boq.root</field>
+    <field name="arch" type="xml">
+        <form string="BoQ Form" class="o_form_view_full_width">
+            <header>
+                <button name="%(hit_boq.action_view_boq_adapter_sale)d"
+                        string="Create Quotation"
+                        type="action"
+                        class="btn-primary"
+                        context="{'default_boq_id': active_id}"/>
+                <button string="Print Report"
+                        type="object"
+                        class="btn-secondary"
+                        name="action_print_report"/>
+                <button name="preview_pdf"
+                        string="Print Preview"
+                        type="object"/>
+                <button name="action_recompute_all_prices"
+                        string="Recompute Prices"
+                        type="object"
+                        class="btn-secondary"
+                        gorups="base.group_system"/>
+            </header>
+            <sheet>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_sale_order"
                             type="object"
-                            class="btn-secondary"
-                            invisible="0"/>
-                </header>
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_sale_order" 
-                                type="object" 
-                                class="oe_stat_button" 
-                                icon="fa-usd">
-                            <field name="sale_order_count" string="Sale Orders" widget="statinfo"/>
-                        </button>
-                    </div>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="boq_code"/>
-                        </h1>
-                    </div>
+                            class="oe_stat_button"
+                            icon="fa-usd">
+                        <field name="sale_order_count" string="Orders" widget="statinfo"/>
+                    </button>
+                </div>
+                <div class="oe_title">
+                    <h1>
+                        <field name="boq_code"/>
+                    </h1>
+                </div>
+                <group>
                     <group>
-                        <group>
-                            <field name="boq_name"/>
-                            <field name="boq_conf_id" invisible="1"/>
-                            <field name="last_update" readonly="1"/>
-                            <field name="modified_by" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="material_margin"/>
-                            <field name="installation_margin"/>
-                        </group>
+                        <field name="boq_name"/>
+                        <field name="boq_conf_id" invisible="1"/>
+                        <field name="last_update" readonly="1"/>
+                        <field name="modified_by" readonly="1"/>
                     </group>
-                    <group string="Pekerjaan">
-                        <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many">
-                            <tree editable="bottom">
-
-                                <control>
-                                    <create name="add_product_control" string="Add a product"/>
-                                    <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
-                                    <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
-                                </control>
-
-                                <field name="sequence" widget="handle" />
-                                <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
-                                <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" optional="show"/>
-                                <field name="code" string="Kode Pekerjaan(w.u.l)" column_invisible="1"/>
-                                <field name="quantity" required="not display_type"/>
-                                <field name="work_unit_line_uom" required="not display_type" />
-                                <field name="master_price" required="not display_type"/>
-                                <field name="override_price" required="not display_type"/>
-                                <field name="display_type" column_invisible="1"/>
-                            </tree>
-                        </field>
-                        <field name="price_final" readonly="1" invisible="1"/>
+                    <group>
+                        <field name="material_margin"/>
+                        <field name="installation_margin"/>
                     </group>
-                    
-                    <notebook>
-                        <page name="pricing" string="Harga" readonly="1">
+                </group>
+                <group string="Pekerjaan">    
+                    <field name="work_unit_line_ids" nolabel="1" colspan="2" widget="section_and_note_one2many">
+                        <tree editable="bottom">
+                            <control>
+                                <create name="add_product_control" string="Add a product"/>
+                                <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                            </control>
 
-                            <group string="After Margin">
-                                <group string="Harga Satuan">
-                                    <field name="work_unit_line_after_margin_ids" nolabel="1" colspan="2">
-                                        <tree editable="bottom">
-                                            <field name="sequence" widget="handle" invisible="1"/>
-                                            <field name="code"/>
-                                            <field name="material_margin_base" string="Material"/>
-                                            <field name="service_margin_base" string="Instalasi"/>
-                                            <field name="others_base_price" string="Lain-Lain"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                                <group string="Harga">
-                                    <field name="work_unit_line_after_margin_ids" nolabel="1" colspan="2">
-                                        <tree editable="bottom">
-                                            <field name="sequence" widget="handle" invisible="1"/>
-                                            <field name="code"/>
-                                            <field name="material_margin_final" string="Material"/>
-                                            <field name="service_margin_final" string="Instalasi"/>
-                                            <field name="others_price_final" string="Lain-Lain"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                                <group string="Total Harga">
-                                    <field name="material_price_final" string="Total Harga Material" widget="monetary"/>                                    
-                                    <field name="installation_price_final" string="Total Harga Instalasi" widget="monetary"/>                                    
-                                    <field name="maintenance_final" string="Total Harga Maintenance" widget="monetary"/>                                    
-                                    <field name="price_final" string="Total Seluruh Harga" widget="monetary"/>                                    
-                                </group>
-                            </group>
+                            <field name="sequence" widget="handle"/>
+                            <field name="work_unit_id" string="Kode Pekerjaan" required="not display_type"/>
+                            <field name="name" string="Nama Pekerjaan" widget="section_and_note_text" readonly="False"/>
+                            <field name="quantity" string="Qty" required="not display_type"/>
+                            <field name="work_unit_line_uom" string="Unit" required="not display_type"/>
 
-                            <group string="Before Margin">
-                                <group string="Harga Satuan">
-                                    <field name="work_unit_line_before_margin_ids" nolabel="1" colspan="2" >
-                                        <tree editable="bottom">
-                                            <field name="sequence" widget="handle" invisible="1"/>
-                                            <field name="code"/>
-                                            <field name="material_base_price" string="Material"/>
-                                            <field name="service_base_price" string="Instalasi"/>
-                                            <field name="others_base_price" string="Lain-Lain"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                                <group string="Harga">
-                                    <field name="work_unit_line_before_margin_ids" nolabel="1" colspan="2">
-                                        <tree editable="bottom">
-                                            <field name="sequence" widget="handle" invisible="1"/>
-                                            <field name="code"/>
-                                            <field name="material_price_final" string="Material"/>
-                                            <field name="service_price_final" string="Instalasi"/>
-                                            <field name="others_price_final" string="Lain-Lain"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                                <group string="Total Harga">
-                                    <field name="material_base_cost" widget="monetary"/>
-                                    <field name="installation_base_cost" widget="monetary"/>
-                                    <field name="maintenance_base_total" widget="monetary"/>
-                                    <field name="price_subtotal" widget="monetary"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="BoQ Notes">
-                                    <field name="notes_general" placeholder="Enter your BoQ notes here..." nolabel="1" colspan="2"/>
-                                </group>
-                                <group string="Exclude Notes">
-                                    <field name="notes_exclude" placeholder="Enter your Exclude notes here..." nolabel="1" colspan="2"/>
-                                </group>
-                            </group>
+                            <field name="material_margin_base" string="Satuan Material (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_margin_base" string="Satuan Instalasi (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="material_margin_final" string="Harga Material (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_margin_final" string="Harga Instalasi (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            
+                            <field name="others_base_price" string="Satuan Lain-Lain (Margin)" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="others_price_final" string="Harga Lain-Lain (Margin)" optional="show" widget="monetary" required="not display_type"/>
 
-                        </page>
-                    </notebook>
+                            <field name="material_base_price" string="Satuan Material" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_base_price" string="Satuan Instalasi" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="material_price_final" string="Harga Material" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="service_price_final" string="Harga Instalasi" optional="show" widget="monetary" required="not display_type"/>
 
-                </sheet>
+                            <field name="others_base_price" string="Satuan Lain-Lain" optional="show" widget="monetary" required="not display_type"/>
+                            <field name="others_price_final" string="Harga Lain-Lain" optional="show" widget="monetary" required="not display_type"/>
+
+                            <field name="override_price" optional="hide" widget="monetary" required="not display_type"/>
+                            
+                            <field name="final_price" string="Total Price" column_invisible="1" widget="monetary" required="not display_type"/>
+                            <field name="display_type" column_invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+
+                <group class="mt-4">
+                    <group string="Totals (Before Margin)">
+                        <field name="material_base_cost" widget="monetary"/>
+                        <field name="installation_base_cost" widget="monetary"/>
+                        <field name="maintenance_base_total" widget="monetary"/>
+                        <field name="price_subtotal" widget="monetary" style="font-weight: bold;"/>
+                    </group>
+                    <group string="Totals (After Margin)">
+                        <field name="material_price_final" string="Total Harga Material" widget="monetary"/>
+                        <field name="installation_price_final" string="Total Harga Instalasi" widget="monetary"/>
+                        <field name="maintenance_final" string="Total Harga Maintenance" widget="monetary"/>
+                        <field name="price_final" string="Total Seluruh Harga" widget="monetary" style="font-weight: bold;"/>
+                    </group>
+                </group>
+
+                <group>
+                    <group string="BoQ Notes">
+                        <field name="notes_general" placeholder="Enter your BoQ notes here..." nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Exclude Notes">
+                        <field name="notes_exclude" placeholder="Enter your Exclude notes here..." nolabel="1" colspan="2"/>
+                    </group>
+                </group>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
                     <field name="activity_ids" widget="mail_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
-            </form>
-        </field>
-    </record>
+            </sheet>
+        </form>
+    </field>
+</record>
 
 </odoo>

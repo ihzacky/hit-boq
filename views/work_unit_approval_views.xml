@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="boq_work_unit_approval_form" model="ir.ui.view">
+        <field name="name">boq_work_unit_approval_form</field>
+        <field name="model">boq.work_unit</field>
+        <field name="inherit_id" ref="hit_boq.menu_work_unit_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_revert_to_previous']" position="before">
+                <button name="button_request_approval" 
+                        string="Request Approval" 
+                        type="object"
+                        class="btn-warning"
+                        invisible="state not in ['draft']" 
+                />
+                <button name="button_to_approve" 
+                        string="Approve" 
+                        type="object"
+                        class="btn-success"
+                        invisible="not show_button_approve" 
+                />
+                <button name="button_to_reject" 
+                        string="Reject" 
+                        type="object"
+                        confirm="Are you sure?"
+                        class="btn-danger"
+                        invisible="not show_button_approve" 
+                />
+                <button name="button_to_revision" 
+                        string="Send to Revision" 
+                        type="object" 
+                        confirm="Are you sure?"
+                        class="btn-secondary"
+                        invisible="state not in ['approved', 'rejected']" 
+                />
+            </xpath>
+
+            <xpath expr="//page[@name='pekerjaan']" position="after">
+                <page string="Approval" name="approval">
+                    <group>
+                        <field name="current_assigned_to" readonly="1"/>
+                        <field name="current_assigned_to_ids" widget="many2many_tags_avatar" readonly="1"/>
+                        <field name="show_button_approve" invisible="1"/>
+                    </group>
+
+                    <field name="release_strategy_ids" readonly="0">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="sequence" readonly="1" string="Level"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="user_ids" readonly="1" widget="many2many_tags_avatar"/>
+                            <field name="state" readonly="1"/>
+                            <field name="note" string="Note"
+                                    readonly="state not in ['draft']"/>
+                            <field name="write_date" string="Date" readonly="1"
+                                    invisible="parent.state not in ['approved', 'reject']"/>
+                        </tree>
+                    </field>
+                </page>                
+            </xpath>
+        </field>
+    </record>
+    
+
+</odoo>
