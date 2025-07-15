@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_view_work_unit_adapter_po" model="ir.actions.act_window">
+        <field name="name">Create Request for Quotation</field>
+        <field name="res_model">work.unit.adapter.po</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_boq_work_unit"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+
+    <record id="view_work_unit_adapter_po_form" model="ir.ui.view">
+        <field name="name">work.unit.adapter.po.form</field>
+        <field name="model">work.unit.adapter.po</field>
+        <field name="arch" type="xml">
+            <form string="Create RFQ from Work Unit">
+                <p>
+                    This action will create Request for Quotation(s) for all purchasable materials in this Work Unit.
+                    <br/><br/>
+                    Products will be grouped by the vendor specified on the product form. If any product is missing a vendor, the operation will be aborted.
+                </p>
+                <field name="work_unit_id" invisible="1"/>
+                <footer>
+                    <button name="action_create_po" type="object"
+                            string="Confirm and Create RFQ(s)"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -8,3 +8,4 @@ from . import boq_root
 from . import boq_work_unit_line
 from . import sale_order
 from . import product_product
+from . import purchase_order

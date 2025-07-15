@@ -38,7 +38,7 @@
                         <div class="row mb-4">
                             <div class="col-6">
                                 <strong>Kode BoQ:</strong> <span t-field="doc.boq_code"/><br/>
-                                <strong>Updated Date:</strong> <span t-field="doc.last_update" t-options='{"widget": "date", "format": "dd-MMM-yy"}'/><br/>
+                                <strong>Updated Date:</strong> <span t-field="doc.last_update"/><br/>
                                 <strong>Updated By:</strong> <span t-field="doc.modified_by"/>
                             </div>
                             <div class="col-6 text-right">

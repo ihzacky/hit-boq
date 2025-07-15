@@ -81,6 +81,28 @@ class BoqWorkUnit(models.Model):
         readonly=True
     )
 
+    # Purchase Order tracking fields
+    purchase_order_ids = fields.One2many(
+        comodel_name='purchase.order',
+        inverse_name='work_unit_id',
+        string='Purchase Orders'
+    )
+    
+    rfq_count = fields.Integer(
+        string='RFQ Count',
+        compute='_compute_purchase_counts'
+    )
+    
+    current_po_count = fields.Integer(
+        string='Current PO Count',
+        compute='_compute_purchase_counts'
+    )
+    
+    past_po_count = fields.Integer(
+        string='Past PO Count',
+        compute='_compute_purchase_counts'
+    )
+
     def write(self, vals):
         # increment revision count
         if 'state' in vals:
@@ -233,7 +255,7 @@ class BoqWorkUnit(models.Model):
                     })
 
     def action_revert_to_previous(self):
-        # reverts the current data to its previous approved version by copying/overwite all values
+        # reverts the current data to its previous approved version by copying/overite all values
         for record in self:
             previous_version = self.search([
                 ('code', '=', record.code),
@@ -298,23 +320,55 @@ class BoqWorkUnit(models.Model):
 
                 return True
 
-    def unlink(self):
+    @api.depends('purchase_order_ids')
+    def _compute_purchase_counts(self):
         for record in self:
-            if not record.is_duplicate:
-                # Find and delete the duplicate record
-                duplicate = self.search([
-                    ('code', '=', record.code),
-                    ('is_duplicate', '=', True)
-                ])
-                if duplicate:
-                    duplicate.with_context(skip_unlink_check=True).unlink()
-            elif self.env.context.get('skip_unlink_check'):
-                # Allow deletion of duplicate when called from parent deletion
-                return super().unlink()
-            else:
-                # Prevent direct deletion of duplicates
-                raise models.ValidationError('Cannot delete duplicate records directly. Delete the original record instead.')
-                
-        return super().unlink()
+            # Get purchase orders related to this work unit
+            purchase_orders = self.env['purchase.order'].search([('work_unit_id', '=', record.id)])
+            
+            # Count RFQs (draft state)
+            rfqs = purchase_orders.filtered(lambda po: po.state == 'draft')
+            record.rfq_count = len(rfqs)
+            
+            # Count current POs (purchase, done states)
+            current_pos = purchase_orders.filtered(lambda po: po.state in ['purchase', 'done'])
+            record.current_po_count = len(current_pos)
+            
+            # Count past POs (cancel state)
+            past_pos = purchase_orders.filtered(lambda po: po.state == 'cancel')
+            record.past_po_count = len(past_pos)
+
+    def action_view_rfqs(self):
+        """Open RFQs related to this work unit"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'RFQs for {self.code}',
+            'res_model': 'purchase.order',
+            'view_mode': 'tree,form',
+            'domain': [('work_unit_id', '=', self.id), ('state', '=', 'draft')],
+            'context': {'default_work_unit_id': self.id},
+        }
+
+    def action_view_current_pos(self):
+        """Open current purchase orders related to this work unit"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Current POs for {self.code}',
+            'res_model': 'purchase.order',
+            'view_mode': 'tree,form',
+            'domain': [('work_unit_id', '=', self.id), ('state', 'in', ['purchase', 'done'])],
+            'context': {'default_work_unit_id': self.id},
+        }
+
+    def action_view_past_pos(self):
+        """Open past purchase orders related to this work unit"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Past POs for {self.code}',
+            'res_model': 'purchase.order',
+            'view_mode': 'tree,form',
+            'domain': [('work_unit_id', '=', self.id), ('state', '=', 'cancel')],
+            'context': {'default_work_unit_id': self.id},
+        }
 
 
