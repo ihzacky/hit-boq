@@ -27,7 +27,7 @@
                 <field name="boq_name" readonly="1" invisible="1"/>
             </xpath>
 
-            <xpath expr="//button[@id='create_invoice']" position="replace">
+            <xpath expr="//button[@id='create_invoice']" position="after">
                 <button name="%(project.open_create_project)d" 
                         string="Create Project" 
                         type="action" 
