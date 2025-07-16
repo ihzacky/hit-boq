@@ -24,8 +24,6 @@
         "data/initial_boq_conf_data.xml",
 
         "wizard/boq_make_sale_views.xml",
-        "wizard/boq_make_po_views.xml",
-        "wizard/work_unit_make_po_views.xml",
 
         "views/sale_order_views.xml",
         "views/product_views.xml",
