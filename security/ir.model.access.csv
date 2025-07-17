@@ -7,3 +7,5 @@ access_boq_service_line,access_boq_service_line,model_boq_service_line,base.grou
 access_boq_others,access_boq_others,model_boq_others,base.group_user,1,1,1,1
 access_boq_conf,access_boq_conf,model_boq_conf,base.group_user,1,1,1,1
 access_boq_adapter_sale,access_boq_adapter_sale,model_boq_adapter_sale,base.group_user,1,1,1,1
+access_sale_order_create_rfq_wizard,access_sale_order_create_rfq_wizard,model_sale_order_create_rfq_wizard,base.group_user,1,1,1,1
+access_sale_order_create_rfq_wizard_line,access_sale_order_create_rfq_wizard_line,model_sale_order_create_rfq_wizard_line,base.group_user,1,1,1,1

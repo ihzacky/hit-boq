@@ -1,5 +1,8 @@
 from odoo import models, fields, api
 from math import ceil
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class BoqWorkUnitLine(models.Model):
     _name = 'boq.work_unit.line'
@@ -72,34 +75,61 @@ class BoqWorkUnitLine(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-            for vals in vals_list:
-                if vals.get('display_type', self.default_get(['display_type'])['display_type']):
-                    vals.update(work_unit_id=False, quantity=0, work_unit_line_uom=False)
-            return super().create(vals_list)
-    
+        for vals in vals_list:
+            if vals.get('display_type'):
+                vals.update(work_unit_id=False, quantity=0, work_unit_line_uom=False)
+        
+        records = super().create(vals_list)
+        # Use with_context to prevent recursion error
+        records.with_context(skip_recompute=True).recompute_prices()
+        return records
+
+    def write(self, vals):
+        # Prevent infinite loop by checking context key
+        if self.env.context.get('skip_recompute'):
+            return super().write(vals)
+        
+        res = super().write(vals)
+        # Use with_context to pass the flag and prevent the loop
+        self.with_context(skip_recompute=True).recompute_prices()
+        return res
+
+    def recompute_prices(self):
+        """A helper method to run all compute methods in the correct order."""
+        for record in self:
+            record._get_work_unit_components()
+            record._get_base_price()
+            record._compute_components_price_final()
+            record._compute_components_price_after_margin()
+            record._compute_components_price_after_margin_final()
     # before margin
-    @api.depends('work_unit_id', 'work_unit_id.material_total', 'work_unit_id.service_total', 'work_unit_id.others_price', 'override_price')
+    @api.depends(
+        'work_unit_id.material_total', 
+        'work_unit_id.service_total', 
+        'work_unit_id.others_price', 
+        'override_price'
+    )
+    @api.depends('work_unit_id.material_total', 'work_unit_id.service_total', 'work_unit_id.others_price', 'override_price')
     def _get_base_price(self):
         for record in self:
-            # Round up to nearest thousand
+            if not record.work_unit_id:
+                record.material_base_price, record.service_base_price, record.others_base_price, record.master_price = 0, 0, 0, 0
+                continue
+            
+            work_unit_code = record.work_unit_id.code or ''
+
             if record.override_price:
-                # Check work unit code prefix
-                if record.code and record.code.startswith('MNT'):
+                if work_unit_code.startswith('MNT'):
                     record.others_base_price = record.override_price
-                    record.service_base_price = 0
-                    record.material_base_price = 0
-                elif record.code and record.code.startswith('INST'):
-                    record.others_base_price = 0
+                    record.service_base_price, record.material_base_price = 0, 0
+                elif work_unit_code.startswith('INST'):
                     record.service_base_price = record.override_price
-                    record.material_base_price = 0
-            
+                    record.others_base_price, record.material_base_price = 0, 0
                 record.master_price = record.work_unit_id.price_unit
-            
-            elif record.override_price == 0:
+            else:
                 record.material_base_price = ceil(record.work_unit_id.material_total / 1000) * 1000
                 record.service_base_price = ceil(record.work_unit_id.service_total / 1000) * 1000
                 record.others_base_price = ceil(record.work_unit_id.others_price / 1000) * 1000
-
                 record.master_price = record.work_unit_id.price_unit
 
     def _inverse_others_base_price(self):
@@ -120,29 +150,29 @@ class BoqWorkUnitLine(models.Model):
 
     # after margin
     @api.depends(
-        'material_base_price', 'service_base_price', 
-        'boq_root_id.material_margin', 'boq_root_id.installation_margin',
-        'work_unit_id.material_total', 'work_unit_id.service_total',
-        'override_price', 'code', 'quantity'
+        'material_base_price', 
+        'service_base_price',
+        'boq_root_id.material_margin', 
+        'boq_root_id.installation_margin',
+        'work_unit_id.code', 
+        'override_price'
+    )
+    @api.depends(
+        'material_base_price', 'service_base_price', 'boq_root_id.material_margin',
+        'boq_root_id.installation_margin', 'work_unit_id.code', 'override_price'
     )
     def _compute_components_price_after_margin(self):
         for record in self:
-            record.material_margin_base = 0.0
-            record.service_margin_base = 0.0
-
             margin_mat = record.boq_root_id.material_margin or 1.0
             margin_service = record.boq_root_id.installation_margin or 1.0
+            work_unit_code = record.work_unit_id.code if record.work_unit_id else ''
 
-            if record.code and record.code.startswith('INST') and record.override_price:
+            if work_unit_code.startswith('INST') and record.override_price:
+                record.material_margin_base = 0.0
                 record.service_margin_base = record.override_price
             else:
-                if record.material_base_price:
-                    material_price = record.material_base_price / margin_mat
-                    record.material_margin_base = ceil(material_price/1000) * 1000
-
-                if record.service_base_price:
-                    service_price = record.service_base_price / margin_service
-                    record.service_margin_base = ceil(service_price/1000) * 1000
+                record.material_margin_base = ceil((record.material_base_price / margin_mat) / 1000) * 1000 if margin_mat != 0 else 0.0
+                record.service_margin_base = ceil((record.service_base_price / margin_service) / 1000) * 1000 if margin_service != 0 else 0.0
 
     @api.depends('material_margin_base', 'service_margin_base', 'others_base_price')
     def _compute_components_price_after_margin_final(self):
@@ -159,10 +189,27 @@ class BoqWorkUnitLine(models.Model):
             record.final_price = sum([record.material_margin_base, record.service_margin_base, record.others_base_price])   
 
     @api.depends('work_unit_id', 'work_unit_id.code', 'work_unit_id.name', 'display_type')
+    @api.depends('work_unit_id.code', 'work_unit_id.name', 'display_type')
     def _get_work_unit_components(self):
         for record in self:
+            if record.display_type or not record.work_unit_id:
+                continue
+            
             record.name = record.work_unit_id.name
             record.code = record.work_unit_id.code
+
+    @api.onchange('work_unit_id')
+    def _onchange_work_unit_id(self):
+        for record in self:
+            if record.work_unit_id:
+                record.name = record.work_unit_id.name
+                record.code = record.work_unit_id.code
+                record.work_unit_line_uom = record.work_unit_id.uom_id
+            else:
+                record.name = ""
+                record.code = ""
+                record.work_unit_line_uom = False
+
 
     @api.depends('work_unit_id', 'work_unit_id.is_duplicate')
     def _get_duplicate_status(self):
@@ -181,8 +228,4 @@ class BoqWorkUnitLine(models.Model):
                 record.service_base_price = record.override_price
                 record.material_base_price = 0
 
-    @api.onchange('work_unit_id')
-    def _onchange_work_unit_id(self):
-        for record in self:
-            if record.work_unit_id and record.work_unit_id.uom_id:
-                record.work_unit_line_uom = record.work_unit_id.uom_id
+    

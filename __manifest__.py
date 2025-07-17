@@ -11,17 +11,20 @@
         "product", 
         "mail", 
         "sale", 
+        "purchase",
         "project",
+        "ssi_multiple_approval_mixin",
+        "winprof_approval",
     ],
     "data": [
 
-        "security/security.xml",
         "security/ir.model.access.csv",
         
         "data/product_tag_data.xml",
         "data/initial_boq_conf_data.xml",
 
         "wizard/boq_make_sale_views.xml",
+        "wizard/sale_order_create_rfq_views.xml",
 
         "views/sale_order_views.xml",
         "views/product_views.xml",
@@ -30,9 +33,15 @@
         "views/boq_conf_views.xml",
         "views/boq_root_views.xml",
         "views/work_unit_views.xml",
+        "views/work_unit_approval_views.xml",
         "report/boq_root_report.xml",
         "views/menu_boq_views.xml",
     ],
+    'assets': {
+        'web.assets_backend': [
+            'hit_boq/static/src/css/boq_views.css',
+        ],
+    },
     "license": "AGPL-3",
     "installable": True,
     "application": True,

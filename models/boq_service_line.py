@@ -28,7 +28,6 @@ class BoqServiceLine(models.Model):
         string="Product", 
         domain=[
             ('type', '=', 'service'),
-            ('is_service', '=', 'True')
         ],
     )
 

@@ -47,12 +47,18 @@
             parent="menu_work_unit"
             sequence="10"
         />
+        
+        <menuitem
+            id="separator_work_unit"
+            name="Pekerjaan"
+            parent="menu_work_unit"
+        />
 
         <menuitem
             id="menu_work_unit_material"
             name="Material"
             action="action_menu_material_products"
-            parent="menu_work_unit"
+            parent="separator_work_unit"
             sequence="11"
         />
         
@@ -60,28 +66,34 @@
             id="menu_work_unit_service"
             name="Jasa"
             action="action_menu_service_products"
-            parent="menu_work_unit"
+            parent="separator_work_unit"
             sequence="12"
         />
 
         <!-- BoQ Sale Order -->
         
         <menuitem
-            id="menu_boq_sale_order"
-            name="Sale Order"
-            action="action_menu_sale_order_view"
+            id="menu_boq_order"
+            name="Order"
             parent="menu_boq"
             sequence="13"
         />
 
-
-        <!-- <menuitem
-            id="menu_boq_project"
-            name="BoQ Project"
-            action="action_menu_project"
-            parent="menu_boq"
-            sequence="13"
-        /> -->
+        <menuitem
+            id="menu_boq_quotation"
+            name="Quotation"
+            action="action_menu_quotation_view"
+            parent="menu_boq_order"
+            sequence="14"
+        />
+        
+        <menuitem
+            id="menu_boq_sale_order"
+            name="Sale Order"
+            action="action_menu_sale_order_view"
+            parent="menu_boq_order"
+            sequence="15"
+        />
 
     </data>
 </odoo>

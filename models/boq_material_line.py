@@ -20,7 +20,6 @@ class BoqMaterialLine(models.Model):
         string="Product",
         domain=[
             ('type', '=', 'consu'),
-            ('is_material', '=', 'True')
         ], 
         tracking=True,
     )
