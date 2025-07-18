@@ -233,7 +233,7 @@ class BoqWorkUnit(models.Model):
                     })
 
     def action_revert_to_previous(self):
-        # reverts the current data to its previous approved version by copying/overwite all values
+        # reverts the current data to its previous approved version by copying/overite all values
         for record in self:
             previous_version = self.search([
                 ('code', '=', record.code),
@@ -297,24 +297,5 @@ class BoqWorkUnit(models.Model):
                 })
 
                 return True
-
-    def unlink(self):
-        for record in self:
-            if not record.is_duplicate:
-                # Find and delete the duplicate record
-                duplicate = self.search([
-                    ('code', '=', record.code),
-                    ('is_duplicate', '=', True)
-                ])
-                if duplicate:
-                    duplicate.with_context(skip_unlink_check=True).unlink()
-            elif self.env.context.get('skip_unlink_check'):
-                # Allow deletion of duplicate when called from parent deletion
-                return super().unlink()
-            else:
-                # Prevent direct deletion of duplicates
-                raise models.ValidationError('Cannot delete duplicate records directly. Delete the original record instead.')
-                
-        return super().unlink()
 
 

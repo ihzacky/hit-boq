@@ -27,7 +27,7 @@
                 <field name="boq_name" readonly="1" invisible="1"/>
             </xpath>
 
-            <xpath expr="//button[@id='create_invoice']" position="replace">
+            <xpath expr="//button[@id='create_invoice']" position="after">
                 <button name="%(project.open_create_project)d" 
                         string="Create Project" 
                         type="action" 
@@ -35,7 +35,22 @@
                         context="{'default_partner_id': partner_id, 'default_name': boq_name}"
                         invisible= "not is_boq or state not in ['sale']"
                 />
+                <button name="action_create_rfq_wizard" 
+                        string="Create RFQ" 
+                        type="object" 
+                        class="btn-primary"
+                        invisible="not is_boq or state not in ['sale']"
+                />
             </xpath>
+                        
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_pos"
+                        icon="fa-file-text-o"
+                        invisible="not is_boq">
+                    <field string="POs" name="purchase_order_count" widget="statinfo"/>
+                </button>
+            </xpath>
+
         </field>
     </record>
 </odoo>

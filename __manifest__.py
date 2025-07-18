@@ -11,6 +11,7 @@
         "product", 
         "mail", 
         "sale", 
+        "purchase",
         "project",
         "ssi_multiple_approval_mixin",
         "winprof_approval",
@@ -23,6 +24,7 @@
         "data/initial_boq_conf_data.xml",
 
         "wizard/boq_make_sale_views.xml",
+        "wizard/sale_order_create_rfq_views.xml",
 
         "views/sale_order_views.xml",
         "views/product_views.xml",

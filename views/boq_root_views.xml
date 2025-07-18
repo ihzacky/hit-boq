@@ -42,7 +42,7 @@
                         string="Recompute Prices"
                         type="object"
                         class="btn-secondary"
-                        gorups="base.group_system"/>
+                        groups="base.group_system"/>
             </header>
             <sheet>
                 <div class="oe_button_box" name="button_box">
