@@ -4,9 +4,9 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
     
     work_unit_ids = fields.Many2many(
-        'boq.work_unit', 
-        'purchase_order_work_unit_rel',  # Add explicit relation table
-        'purchase_order_id',             # Add explicit column names
+        'boq.work_unit',
+        'purchase_order_work_unit_rel',
+        'purchase_order_id',
         'work_unit_id',
         string='Work Units'
     )

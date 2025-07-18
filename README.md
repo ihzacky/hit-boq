@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Hit BoQ (Bill of Quantities) module is a comprehensive Odoo 17 application designed to manage construction project cost estimation and procurement workflows. It provides a complete solution for creating detailed BOQs, managing work units, calculating margins, and integrating with sales orders and purchase requisitions.
+The Hit BoQ (Bill of Quantities) module is a comprehensive Odoo 17 application designed to manage project cost estimation. It provides a complete solution for creating detailed BOQs, managing work units, calculating margins, and integrating with sales orders.
 
 ## Dependencies
 
@@ -16,9 +16,11 @@ The module depends on the following Odoo modules:
 
 External Modules:
 - `ssi_multiple_approval_mixin` - Approval workflow functionality
-- `winprof_approval` - Custom approval processes
+- `winprof_approval` - HIT Custom approval processes
 
 ## Architecture Overview
+
+![BoQ Module's ERD Diagram![Alt text](image-url)](ERD.png)
 
 ### Core Models
 
@@ -29,7 +31,6 @@ The central model that represents a complete Bill of Quantities document.
 - Hierarchical cost calculation with margins
 - Integration with sale orders and purchase orders
 - Material, installation, and maintenance cost tracking
-- Currency support (default: IDR)
 - Multi-state workflow (draft → confirm → done)
 
 **Important Fields:**
@@ -181,17 +182,17 @@ Base Costs → Apply Margins → Calculate Finals → Aggregate to BoQ Total
 
 ### Menu Hierarchy
 ```
-BoQ/
-├── All BoQ/
+BoQ
+├── All BoQ
 │   ├── Home (BoQ List)
 │   └── BoQ Configuration
-├── Satuan Pekerjaan/
-│   └── Home (Work Units List)
-├── Sales/
-│   ├── BoQ Quotations
-│   └── BoQ Sale Orders
-└── Approval/
-    └── Work Unit Approval
+├── Satuan Pekerjaan
+│   ├── Home (Work Units List)
+│   ├── Material
+│   └── Jasa
+└── Sales
+   ├── Quotations
+   └── Sale Orders
 ```
 
 ### Key Views
@@ -204,7 +205,7 @@ BoQ/
 #### Work Unit Views
 - **Tree View**: Work unit catalog with status
 - **Form View**: Detailed component management
-- **Approval View**: Workflow management interface
+- **Approval View**: Approval 
 
 ## Wizards
 
@@ -212,12 +213,17 @@ BoQ/
 Converts approved BoQ to sale order with proper line item mapping.
 
 ### 2. Create RFQ (`sale.order.create.rfq.wizard`)
-Generates purchase requisitions from sale order work units.
+Generates purchase order from sale order.
 
 **Key Features:**
 - Selective work unit inclusion
 - Vendor pre-selection based on materials
 - Automatic product line creation
+- Automatically set SO id on PO upon creation
+
+**Issues:**
+- RFQ wizard only retrieves the first vendor from material product suppliers
+- No vendor selection yet
 
 ## Security & Access Control
 
@@ -247,7 +253,7 @@ hit_boq/
 │   ├── boq_service_line.py          # Service components
 │   ├── boq_others.py                # Other cost components
 │   ├── boq_conf.py                  # Configuration model
-│   ├── boq_work_unit_approval.py    # Approval workflow
+│   ├── boq_work_unit_approval.py    # Approval page views for work_unit
 │   ├── sale_order.py                # Sales integration
 │   ├── purchase_order.py            # Purchase integration
 │   └── product_product.py           # Product extensions
@@ -271,10 +277,7 @@ hit_boq/
 ├── security/
 │   └── ir.model.access.csv          # Access control
 ├── static/src/css/
-│   └── boq_views.css                # Custom styling
-└── tests/
-    ├── __init__.py
-    └── test_case2_refactor.py       # Unit tests
+   └── boq_views.css                # Custom styling
 ```
 
 ### Key Methods
@@ -315,14 +318,13 @@ def _compute_component_prices(self):
 1. Install module dependencies
 2. Configure BoQ settings in BoQ Configuration menu
 3. Set up product tags for BoQ items
-4. Configure approval workflows
+4. Configure approval template through settings (Multi Approval/Template on settings)
 
 ### Key Configuration Parameters
 - Material margin percentage
 - Installation margin percentage  
 - Maintenance margin percentage
 - Default profit percentage
-- Currency settings (default: IDR)
 
 ## Customization Guidelines
 
@@ -332,28 +334,11 @@ def _compute_component_prices(self):
 3. Update cost computation methods
 4. Add UI components in work unit form view
 
-### Extending Approval Workflow
-1. Modify state selections in work unit model
-2. Add corresponding action methods
-3. Update approval views and buttons
-4. Configure approval rules in dependent modules
-
 ### Custom Reports
 1. Inherit from existing QWeb report template
 2. Extend report context with custom data
 3. Modify report actions for new variants
 
-## Performance Considerations
-
-### Database Optimization
-- Use computed fields with store=True for frequently accessed calculations
-- Index commonly searched fields (codes, names, states)
-- Optimize One2many field domains
-
-### Calculation Efficiency
-- Cache margin calculations at BoQ conf level
-- Use batch operations for bulk updates
-- Implement lazy loading for large work unit sets
 
 ## Migration Notes
 
@@ -361,6 +346,7 @@ def _compute_component_prices(self):
 - Built for Odoo 17
 - Uses modern ORM patterns and computed fields
 - Leverages mail.thread for activity tracking
+- Uses custom approval module ('ssi_multiple_approval_mixin' and 'winprof_approval')
 
 ### Data Migration
 When upgrading from previous versions:
@@ -388,12 +374,11 @@ When upgrading from previous versions:
    - Check purchase order linking
    - Verify project integration settings
 
-### Existing problems/bugs:
-    - SO button box ('POs' field, 'statinfo' widget) stays on 0
+### Existing problems/bugs
+- SO button box ('POs' field, 'statinfo' widget) stays on 0
 
 ### Notes:
-    - PO to SO relation. PO creation will automatically get the SO.id on creation.
-
+- PO to SO relation. PO creation will automatically get the SO id on creation.
 ---
 
 

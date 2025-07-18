@@ -13,7 +13,6 @@ class BoqServiceLine(models.Model):
     service_pre_price = fields.Monetary(string='Price After Profit', currency_field='currency_id', compute='_compute_service_price')
     service_base_price = fields.Monetary(string='Base Price', currency_field='currency_id', compute='_get_attributes_from_product')
     
-
     service_quantity = fields.Float(string='Quantity', default=1)
 
     sequence = fields.Integer(string="Sequence", default="1")

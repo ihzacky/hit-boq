@@ -1,6 +1,5 @@
 from odoo import models, fields, api
 
-
 class BoqWorkUnitApproval(models.Model):
     _inherit = "boq.work_unit"
 
@@ -30,7 +29,6 @@ class BoqWorkUnitApproval(models.Model):
 
     def set_rejected(self):
         return self.write({"state": "rejected"})
-
 
     # -------------------------------------------------------------
     

@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, Command
 from odoo.exceptions import ValidationError
 
 
@@ -27,7 +27,7 @@ class SaleOrderCreateRfqWizard(models.TransientModel):
             for work_unit_line in boq.work_unit_line_ids:
                 work_unit = work_unit_line.work_unit_id
                 if work_unit and work_unit.material_line:
-                    work_unit_lines.append((0, 0, {
+                    work_unit_lines.append(Command.create({
                         'work_unit_id': work_unit.id,
                         'selected': False,
                     }))
@@ -52,10 +52,11 @@ class SaleOrderCreateRfqWizard(models.TransientModel):
             work_unit = line.work_unit_id
             for material_line in work_unit.material_line:
                 if material_line.product_id:
-                    # Get vendor from product supplier info
+
                     product_vendor = None
                     if material_line.product_id.seller_ids:
-                        # Use the first (latest/top) vendor from supplier list
+                        
+                        # for now use the first (latest/top) vendor from vendor list
                         product_vendor = material_line.product_id.seller_ids[0].partner_id
                         vendors.add(product_vendor.id)
                     
@@ -66,7 +67,7 @@ class SaleOrderCreateRfqWizard(models.TransientModel):
                         'product_uom': material_line.material_uom.id,
                         'price_unit': material_line.material_base_price,
                     }
-                    order_lines.append((0, 0, order_line_vals))
+                    order_lines.append(Command.create(order_line_vals))
         
         if not vendors:
             raise ValidationError(

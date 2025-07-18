@@ -13,7 +13,6 @@
         <field name="name">menu.boq.conf.tree</field>
         <field name="model">boq.conf</field>
         <field name="arch" type="xml">
-            
             <tree string="boq conf tree">
                 <field name="profit_percentage"/>
                 <field name="material_margin"/>
